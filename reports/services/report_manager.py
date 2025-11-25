@@ -5,8 +5,8 @@ from categories.models import Category
 from django.db.models import Sum
 
 class ReportManager:
-    def __init__(self, usuario):
-        self.usuario = usuario
+    def __init__(self, usuario_profile):
+        self.usuario = usuario_profile
 
     def gastos_por_categoria(self):
         return (

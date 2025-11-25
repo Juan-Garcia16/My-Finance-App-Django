@@ -3,8 +3,8 @@ from budgets.models import Presupuesto
 from categories.models import Category
 
 class TransactionManager:
-    def __init__(self, usuario):
-        self.usuario = usuario
+    def __init__(self, usuario_profile):
+        self.usuario = usuario_profile
 
     def registrar_transaccion(self, tipo, categoria, monto, fecha, descripcion=""):
         categoria_obj = Category.objects.get(id=categoria, usuario=self.usuario)

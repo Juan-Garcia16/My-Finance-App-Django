@@ -1,11 +1,11 @@
 from django.db import models
-from users.models import User
+from users.models import Profile
 from categories.models import Category
 
 # Create your models here.
 
 class Presupuesto(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(Profile, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Category, on_delete=models.CASCADE)
     mes = models.CharField(max_length=20)
     limite = models.DecimalField(max_digits=12, decimal_places=2)

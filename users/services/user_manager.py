@@ -1,4 +1,4 @@
-from users.models import User
+from users.models import Profile
 
 class UserManagerService:
     def actualizar_moneda(self, usuario, nueva_moneda):

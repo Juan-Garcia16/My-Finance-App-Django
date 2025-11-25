@@ -2,8 +2,8 @@ from budgets.models import Presupuesto
 from categories.models import Category
 
 class BudgetManager:
-    def __init__(self, usuario):
-        self.usuario = usuario
+    def __init__(self, usuario_profile):
+        self.usuario = usuario_profile
 
     def crear_presupuesto(self, categoria_id, limite, mes):
         categoria = Category.objects.get(id=categoria_id, usuario=self.usuario)

@@ -1,8 +1,8 @@
 from goals.models import MetaAhorro
 
 class GoalManager:
-    def __init__(self, usuario):
-        self.usuario = usuario
+    def __init__(self, usuario_profile):
+        self.usuario = usuario_profile
 
     def crear_meta(self, nombre, monto_objetivo, fecha_limite):
         return MetaAhorro.objects.create(

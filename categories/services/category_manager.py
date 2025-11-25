@@ -1,8 +1,8 @@
 from categories.models import Category
 
 class CategoryManager:
-    def __init__(self, usuario):
-        self.usuario = usuario
+    def __init__(self, usuario_profile):
+        self.usuario = usuario_profile
 
     # Crear una nueva categoría
     def crear_categoria(self, nombre, tipo, color="#22C55E"):

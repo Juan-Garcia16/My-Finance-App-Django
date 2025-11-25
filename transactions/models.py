@@ -1,12 +1,12 @@
 from django.db import models
-from users.models import User
+from users.models import Profile
 from categories.models import Category
 from django.utils import timezone
 
 # Create your models here.
 
 class Transaccion(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(Profile, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Category, on_delete=models.CASCADE)
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     fecha = models.DateField(default=timezone.now)
