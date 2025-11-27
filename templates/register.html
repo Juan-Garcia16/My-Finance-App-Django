@@ -20,9 +20,9 @@
         theme: {
           extend: {
             colors: {
-              primary: "#28a745",
+              primary: "#2ECC71",
               secondary: "#003366",
-              "background-light": "#F8F9FA",
+              "background-light": "#F6F9FC",
               "background-dark": "#111621",
               "text-main": "#343a40",
               "text-secondary": "#636f88",
@@ -56,35 +56,28 @@
     >
       <div class="layout-container flex h-full grow flex-col">
         <header
-          class="flex items-center justify-between whitespace-nowrap px-4 sm:px-10 py-4"
+          class="flex items-center justify-between whitespace-nowrap px-4 sm:px-10 p-4 pb-0"
         >
-          <div class="flex items-center gap-3 text-secondary dark:text-white">
-            <div class="size-8 text-primary">
-              <svg
-                fill="none"
-                viewbox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M24 4C12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20S35.05 4 24 4zm-4 28h-4v-8h4v8zm4 0h-4v-16h4v16zm8 0h-4V16h4v16z"
-                  fill="currentColor"
-                ></path>
-              </svg>
+          <div class="mb-4 text-center">
+          <div class="inline-flex items-center justify-center gap-3">
+            <div class="text-primary dark:text-primary-light flex items-center">
+              <span class="material-symbols-outlined text-5xl"> savings </span>
             </div>
-            <h2 class="text-xl font-bold leading-tight tracking-[-0.015em]">
-              MyFinanceApp
-            </h2>
+            <h1 class="text-3xl font-bold text-dark-blue dark:text-white"
+              >MyFinanceApp</h1
+            >
           </div>
+        </div>
           <a
             class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-transparent text-secondary dark:text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-200 dark:hover:bg-container-dark transition-colors"
-            href="#"
+            href="{% url 'users:login' %}"
           >
             <span class="truncate">Iniciar Sesión</span>
           </a>
         </header>
-        <main class="flex-1 w-full py-12 px-4">
+        <main class="flex w-full py-12 pt-4 px-4 justify-center">
           <div
-            class="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16"
+            class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 justify-center justify-items-center"
           >
             <div class="flex flex-col items-start gap-4">
               <div class="flex flex-col gap-3">
@@ -100,18 +93,18 @@
                   forma inteligente.
                 </p>
               </div>
-              <div class="w-full max-w-md pt-8">
+              <div class="w-full pt-8">
                 <img
                   class="rounded-xl object-cover aspect-video"
                   data-alt="Una persona interactuando con una calculadora y gráficos financieros, simbolizando la gestión de finanzas personales"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5cH29en3ebqLc5jcUhzowYX8vb44UIDMjVGMZRXkxp_PvTIkcFvRnu-RkMvn9wRvISYEK6bI5XoLQ9GskACSw3nB0riLHnsGdv2JYX_ND4r4ao1Ib9ejmojroAPyz9e1GZnvFupgIxLdmHIb8JOn6Uj0UFSUNrTFpi5ChThY3HwPDnBvBYvyB02sA4C7lOXiK2ZzWqgfZvD9MbBV8vZppNu-8evdDXeMU0M6u48aCHhejPpVzNJWUB9PsyXtY4qt4dZrlj07L6EcO"
+                  src="https://eje360.co/wp-content/uploads/2024/08/como-manejar-mi-dinero-el-abc-de-las-finanzas-personales6.jpeg"
                 />
               </div>
             </div>
             <div
-              class="flex w-full max-w-md flex-col justify-center rounded-xl bg-container-light dark:bg-container-dark p-8 shadow-lg"
+              class="flex w-full  flex-col justify-center rounded-xl bg-container-light dark:bg-container-dark p-8 shadow-lg mx-auto"
             >
-              <form method="post" class="flex w-full flex-col gap-6">
+              <form method="post" class="flex w-full flex-col gap-6 px-6">
                 {% csrf_token %}
                 {% if form.errors %}
                   <div class="text-red-600">Por favor corrige los errores del formulario.</div>

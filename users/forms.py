@@ -17,9 +17,11 @@ class UserRegisterForm(UserCreationForm):
         ('MXN', 'MXN - Peso mexicano'),
         ('GBP', 'GBP - Libra esterlina'),
     ], widget=forms.Select(attrs={'class': 'form-select flex w-full rounded-lg h-12 px-3'}), initial='COP')
+    
 
     saldo_inicial = forms.DecimalField(required=False, max_digits=12, decimal_places=2, initial=0,
-                                       widget=forms.NumberInput(attrs={'class': 'form-input flex w-full rounded-lg h-12 px-3', 'placeholder': '0.00'}))
+                                       widget=forms.NumberInput(attrs={'class': 'form-input flex w-full rounded-r-lg h-12 px-3', 'placeholder': '0.00'}))
+
 
     class Meta:
         model = User

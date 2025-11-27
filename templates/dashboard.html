@@ -31,8 +31,13 @@
           extend: {
             colors: {
               primary: {
-                DEFAULT: "#1A237E",
+                DEFAULT: "#2ECC71",
                 light: "#E8EAF6",
+                "dark-button": "#1A237E",
+                "background-light": "#F6F9FC",
+                "background-dark": "#111621",
+                "dark-blue": "#0A2540",
+                "medium-gray": "#6B7280",
               },
               accent: "#2ECC71",
               danger: "#E53935",
@@ -74,7 +79,7 @@
             <div class="text-primary dark:text-primary-light">
               <span class="material-symbols-outlined text-4xl"> savings </span>
             </div>
-            <h1 class="text-xl font-bold text-primary dark:text-primary-light">
+            <h1 class="text-xl font-bold text-primary-dark-blue">
               MyFinanceApp
             </h1>
           </div>
@@ -130,7 +135,7 @@
           </a>
           <form method="post" action="{% url 'users:logout' %}">
             {% csrf_token %}
-            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-white/10">
+            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-white/10 text-red-600">
               <span class="material-symbols-outlined">logout</span>
               <p class="text-sm font-medium">Salir</p>
             </button>
@@ -199,7 +204,7 @@
                 <span>Agregar Ingreso</span>
               </button>
               <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 bg-primary px-4 text-sm font-bold text-white"
+                class="flex max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 bg-primary-dark-button px-4 text-sm font-bold text-white"
               >
                 <span class="material-symbols-outlined">add</span>
                 <span>Agregar Gasto</span>
