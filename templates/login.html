@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Iniciar Sesión - MyFinanceApp</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap"
+      rel="stylesheet"
+      
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400,FILL@0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2ECC71",
+              "background-light": "#F6F9FC",
+              "background-dark": "#111621",
+              "dark-blue": "#0A2540",
+              "medium-gray": "#6B7280",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .form-input {
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      .form-input:focus-within {
+        border-color: #2ecc71 !important;
+        box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+      }
+    </style>
+  </head>
+  <body class="font-display">
+    <div
+      class="relative flex min-h-screen w-full flex-col items-center justify-center bg-background-light group/design-root dark:bg-background-dark"
+      style="font-family: 'Inter', sans-serif"
+    >
+      <div class="w-full max-w-md p-6">
+        <div class="mb-4 text-center">
+          <div class="inline-flex items-center justify-center gap-3">
+            <div class="text-primary dark:text-primary-light flex items-center">
+              <span class="material-symbols-outlined text-5xl"> savings </span>
+            </div>
+            <span class="text-3xl font-bold text-dark-blue dark:text-white"
+              >MyFinanceApp</span
+            >
+          </div>
+        </div>
+        <div
+          class="flex flex-col gap-8 rounded-xl bg-white p-8 shadow-sm dark:bg-zinc-800"
+        >
+          <div class="text-center">
+            <h1
+              class="text-dark-blue dark:text-white tracking-light text-2xl font-bold leading-tight"
+            >
+              Iniciar sesión
+            </h1>
+          </div>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-col">
+              <label
+                class="text-medium-gray dark:text-gray-300 text-sm font-medium leading-normal pb-2"
+                for="email"
+                >Correo electrónico</label
+              >
+              <div class="relative flex w-full items-center">
+                <input
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-dark-blue dark:text-white focus:outline-0 focus:ring-0 border border-[#dcdfe5] dark:border-gray-600 bg-white dark:bg-zinc-700 h-12 placeholder:text-medium-gray dark:placeholder:text-gray-400 text-base font-normal leading-normal"
+                  id="email"
+                  placeholder="tu@correo.com"
+                  type="email"
+                  value=""
+                />
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <label
+                class="text-medium-gray dark:text-gray-300 text-sm font-medium leading-normal pb-2"
+                for="password"
+                >Contraseña</label
+              >
+              <div class="relative flex w-full flex-1 items-stretch rounded-lg">
+                <input
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-dark-blue dark:text-white focus:outline-0 focus:ring-0 border border-[#dcdfe5] dark:border-gray-600 bg-white dark:bg-zinc-700 h-12 placeholder:text-medium-gray dark:placeholder:text-gray-400 text-base font-normal leading-normal"
+                  id="password"
+                  placeholder="Ingresa tu contraseña"
+                  type="password"
+                  value=""
+                />
+                <button
+                  aria-label="Mostrar contraseña"
+                  class="absolute right-0 top-0 flex h-full items-center justify-center px-4 text-medium-gray dark:text-gray-400"
+                >
+                </button>
+              </div>
+
+            </div>
+          </div>
+          <div class="flex flex-col gap-4">
+            <button
+              class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 py-3 flex-1 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-green-600 transition-colors duration-200"
+            >
+              <span class="truncate">Iniciar Sesión</span>
+            </button>
+            <p
+              class="text-medium-gray dark:text-gray-400 text-sm font-normal leading-normal text-center"
+            >
+              ¿No tienes una cuenta?
+              <a class="font-bold text-primary hover:underline" href="#"
+                >Crear cuenta</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
