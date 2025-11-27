@@ -111,105 +111,57 @@
             <div
               class="flex w-full max-w-md flex-col justify-center rounded-xl bg-container-light dark:bg-container-dark p-8 shadow-lg"
             >
-              <form class="flex w-full flex-col gap-6">
+              <form method="post" class="flex w-full flex-col gap-6">
+                {% csrf_token %}
+                {% if form.errors %}
+                  <div class="text-red-600">Por favor corrige los errores del formulario.</div>
+                {% endif %}
                 <label class="flex flex-col w-full">
-                  <p
-                    class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2"
-                  >
-                    Nombre Completo
-                  </p>
-                  <input
-                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-main dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-container-light dark:bg-background-dark h-12 placeholder:text-text-secondary px-3 text-base font-normal leading-normal"
-                    placeholder="Tu Nombre Completo"
-                    type="text"
-                  />
+                  <p class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2">Nombre de usuario</p>
+                  {{ form.username }}
+                  {% if form.username.errors %}
+                    <div class="text-red-600 text-sm">{{ form.username.errors|join:", " }}</div>
+                  {% endif %}
                 </label>
+
                 <label class="flex flex-col w-full">
-                  <p
-                    class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2"
-                  >
-                    Correo Electrónico
-                  </p>
-                  <input
-                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-main dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-container-light dark:bg-background-dark h-12 placeholder:text-text-secondary px-3 text-base font-normal leading-normal"
-                    placeholder="tu.email@ejemplo.com"
-                    type="email"
-                  />
+                  <p class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2">Correo Electrónico</p>
+                  {{ form.email }}
+                  {% if form.email.errors %}
+                    <div class="text-red-600 text-sm">{{ form.email.errors|join:", " }}</div>
+                  {% endif %}
                 </label>
+
                 <label class="flex flex-col w-full">
-                  <p
-                    class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2"
-                  >
-                    Contraseña
-                  </p>
-                  <div class="flex w-full flex-1 items-stretch rounded-lg">
-                    <input
-                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-l-lg text-text-main dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-container-light dark:bg-background-dark h-12 placeholder:text-text-secondary pl-3 pr-2 border-r-0 text-base font-normal leading-normal"
-                      placeholder="Crea una contraseña segura"
-                      type="password"
-                    />
-                    <button
-                      class="text-text-secondary dark:text-gray-400 flex border border-border-light dark:border-border-dark bg-container-light dark:bg-background-dark items-center justify-center px-3 rounded-r-lg border-l-0 focus:outline-0 focus:ring-2 focus:ring-primary/50"
-                      type="button"
-                    >
-                      <span class="material-symbols-outlined text-xl"
-                        >visibility</span
-                      >
-                    </button>
-                  </div>
+                  <p class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2">Contraseña</p>
+                  {{ form.password1 }}
+                  {% if form.password1.errors %}
+                    <div class="text-red-600 text-sm">{{ form.password1.errors|join:", " }}</div>
+                  {% endif %}
                 </label>
+
+                <label class="flex flex-col w-full">
+                  <p class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2">Confirmar Contraseña</p>
+                  {{ form.password2 }}
+                  {% if form.password2.errors %}
+                    <div class="text-red-600 text-sm">{{ form.password2.errors|join:", " }}</div>
+                  {% endif %}
+                </label>
+
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <label class="flex flex-col w-full">
-                    <p
-                      class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2"
-                    >
-                      Moneda Preferida
-                    </p>
-                    <select
-                      class="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-main dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-container-light dark:bg-background-dark h-12 placeholder:text-text-secondary px-3 text-base font-normal leading-normal"
-                    >
-                      <option>USD - Dólar Estadounidense</option>
-                      <option>EUR - Euro</option>
-                      <option>MXN - Peso Mexicano</option>
-                      <option>GBP - Libra Esterlina</option>
-                    </select>
+                    <p class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2">Moneda Preferida</p>
+                    {{ form.moneda_preferida }}
                   </label>
                   <label class="flex flex-col w-full">
-                    <p
-                      class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2"
-                    >
-                      Saldo Inicial (opcional)
-                    </p>
+                    <p class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2">Saldo Inicial (opcional)</p>
                     <div class="flex w-full flex-1 items-stretch rounded-lg">
-                      <span
-                        class="text-text-secondary dark:text-gray-400 flex border border-border-light dark:border-border-dark bg-gray-100 dark:bg-background-dark/50 items-center justify-center px-3 rounded-l-lg border-r-0"
-                        >$</span
-                      >
-                      <input
-                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-text-main dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-container-light dark:bg-background-dark h-12 placeholder:text-text-secondary px-3 border-l-0 text-base font-normal leading-normal"
-                        placeholder="0.00"
-                        step="0.01"
-                        type="number"
-                      />
+                      <span class="text-text-secondary dark:text-gray-400 flex border border-border-light dark:border-border-dark bg-gray-100 dark:bg-background-dark/50 items-center justify-center px-3 rounded-l-lg border-r-0">$</span>
+                      {{ form.saldo_inicial }}
                     </div>
                   </label>
                 </div>
-                <label class="flex flex-col w-full">
-                  <p
-                    class="text-text-main dark:text-gray-200 text-sm font-medium leading-normal pb-2"
-                  >
-                    Categorías Iniciales
-                  </p>
-                  <textarea
-                    class="form-textarea flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg text-text-main dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-container-light dark:bg-background-dark placeholder:text-text-secondary p-3 text-base font-normal leading-normal"
-                    placeholder="Ej: Renta, Comida, Transporte, Ocio"
-                    rows="3"
-                  ></textarea>
-                </label>
-                <button
-                  class="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark transition-all duration-200"
-                  type="submit"
-                >
+                <button class="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 dark:focus:ring-offset-background-dark transition-all duration-200" type="submit">
                   <span class="truncate">Crear Cuenta</span>
                 </button>
                 <p

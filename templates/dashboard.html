@@ -128,12 +128,13 @@
             <span class="material-symbols-outlined">settings</span>
             <p class="text-sm font-medium">Configuración</p>
           </a>
-          <button
-            class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-white/10"
-          >
-            <span class="material-symbols-outlined">menu_open</span>
-            <p class="text-sm font-medium">Minimizar</p>
-          </button>
+          <form method="post" action="{% url 'users:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-white/10">
+              <span class="material-symbols-outlined">logout</span>
+              <p class="text-sm font-medium">Salir</p>
+            </button>
+          </form>
         </div>
       </aside>
       <!-- Main Content -->
@@ -184,7 +185,7 @@
               <h1
                 class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark"
               >
-                Bienvenido, Alex
+                Bienvenido, {{ user.username }}!
               </h1>
               <p class="text-text-secondary dark:text-text-secondary-dark">
                 Aquí está tu resumen financiero de este mes.
@@ -220,7 +221,7 @@
               <p
                 class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark"
               >
-                $25,480.50
+                {{ profile.saldo_actual }}
               </p>
               <p class="text-base font-medium text-accent">+2.5%</p>
             </div>
