@@ -3,6 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from .forms import UserRegisterForm
+from .forms import UserUpdateForm, ProfileUpdateForm
+from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Profile
 
@@ -41,3 +43,31 @@ def dashboard_view(request):
 		}
 	)
 	return render(request, 'dashboard.html', {'profile': profile})
+
+@login_required
+def profile_view(request):
+	# Ensure profile exists
+	profile, created = Profile.objects.get_or_create(
+		user=request.user,
+		defaults={
+			'moneda_preferida': 'COP',
+			'saldo_inicial': 0,
+			'saldo_actual': 0,
+		}
+	)
+
+	if request.method == 'POST':
+		u_form = UserUpdateForm(request.POST, instance=request.user)
+		p_form = ProfileUpdateForm(request.POST, instance=profile)
+		if u_form.is_valid() and p_form.is_valid():
+			u_form.save()
+			p_form.save()
+			messages.success(request, 'Perfil actualizado correctamente.')
+			return redirect('users:profile')
+		else:
+			messages.error(request, 'Por favor corrige los errores en el formulario.')
+	else:
+		u_form = UserUpdateForm(instance=request.user)
+		p_form = ProfileUpdateForm(instance=profile)
+
+	return render(request, 'users/profile.html', {'u_form': u_form, 'p_form': p_form, 'profile': profile})

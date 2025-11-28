@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="flex-1 p-8 pb-16 bg-background-light dark:bg-background-dark mb-8">
+  <div class="max-w-4xl mx-auto px-8 pb-16">
+    <!-- PageHeading -->
+    <div class="flex flex-wrap justify-between gap-3 pb-8">
+      <div class="flex min-w-72 flex-col gap-2">
+        <h2 class="text-primary-dark-blue dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+          Mi Perfil
+        </h2>
+        <p class="text-[#63886f] dark:text-[#a2bba9] text-base font-normal leading-normal">
+          Visualiza y actualiza la información de tu cuenta.
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-[#1C2C21] p-24 py-8 rounded-xl border border-[#dce5df] dark:border-transparent">
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+              <div class="p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <h3 class="text-primary dark:text-white text-[22px] font-bold leading-tight">
+          Información Personal
+        </h3>
+        <div class="flex flex-wrap items-end gap-6">
+          <label class="flex flex-col min-w-40 flex-1">
+            <p class="text-[#111813] dark:text-white text-base font-medium leading-normal pb-2">Nombre</p>
+            {{ u_form.username }}
+            {% if u_form.username.errors %}
+              <div class="text-red-600 text-sm">{{ u_form.username.errors|join:", " }}</div>
+            {% endif %}
+          </label>
+          <label class="flex flex-col min-w-40 flex-1">
+            <p class="text-[#111813] dark:text-white text-base font-medium leading-normal pb-2">Correo electrónico</p>
+            {{ u_form.email }}
+            {% if u_form.email.errors %}
+              <div class="text-red-600 text-sm">{{ u_form.email.errors|join:", " }}</div>
+            {% endif %}
+          </label>
+        </div>
+
+        <div class="border-t border-[#dce5df] dark:border-background-dark my-6"></div>
+
+        <h3 class="text-primary dark:text-white text-[22px] font-bold leading-tight">Ajustes Financieros</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <label class="flex flex-col min-w-40 flex-1">
+            <p class="text-[#111813] dark:text-white text-base font-medium leading-normal pb-2">Moneda preferida</p>
+            {{ p_form.moneda_preferida }}
+            {% if p_form.moneda_preferida.errors %}
+              <div class="text-red-600 text-sm">{{ p_form.moneda_preferida.errors|join:", " }}</div>
+            {% endif %}
+          </label>
+          <label class="flex flex-col min-w-40 flex-1">
+            <p class="text-[#111813] dark:text-white text-base font-medium leading-normal pb-2">Saldo inicial</p>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#63886f] dark:text-[#a2bba9]">$</span>
+              {{ p_form.saldo_inicial }}
+            </div>
+            {% if p_form.saldo_inicial.errors %}
+              <div class="text-red-600 text-sm">{{ p_form.saldo_inicial.errors|join:", " }}</div>
+            {% endif %}
+          </label>
+        </div>
+        <div class="border-t border-[#dce5df] dark:border-background-dark my-6"></div>
+        <div class="py-3 mt-4">
+          <label class="flex flex-col w-full">
+            <p class="text-[#111813] dark:text-white text-base font-medium leading-normal pb-2">Categorías iniciales</p>
+            <div class="flex flex-wrap gap-2 items-center p-3 border border-[#dce5df] dark:border-[#3a4c41] rounded-lg bg-white dark:bg-[#112116] min-h-14">
+              <!-- keep this area static for now; could be converted to dynamic tags later -->
+              <div class="flex items-center gap-1 bg-primary/20 text-primary font-medium px-3 py-1 rounded-full text-sm">
+                <span>Comida</span>
+                <button class="text-primary/70 hover:text-primary" type="button">
+                  <span class="material-symbols-outlined text-base">close</span>
+                </button>
+              </div>
+              <div class="flex items-center gap-1 bg-primary/20 text-primary font-medium px-3 py-1 rounded-full text-sm">
+                <span>Transporte</span>
+                <button class="text-primary/70 hover:text-primary" type="button">
+                  <span class="material-symbols-outlined text-base">close</span>
+                </button>
+              </div>
+              <input class="form-input flex-1 min-w-[150px] bg-transparent border-0 focus:ring-0 text-[#111813] dark:text-white placeholder:text-[#63886f] dark:placeholder:text-[#a2bba9] text-base" placeholder="Añadir otra categoría..." type="text" />
+            </div>
+          </label>
+        </div>
+        <div class="flex justify-end pt-8">
+          <button type="submit" class="flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-primary text-[#112116] text-base font-bold leading-normal">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock %}

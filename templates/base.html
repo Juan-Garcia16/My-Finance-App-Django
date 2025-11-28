@@ -85,11 +85,16 @@
           </div>
           <nav class="flex flex-col gap-2">
             <a
-              class="flex items-center gap-3 rounded-lg bg-primary-light px-3 py-2 text-primary dark:bg-primary/20 dark:text-primary-light"
-              href="#"
+              href="{% url 'users:dashboard' %}"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 
+              {% if request.resolver_match.url_name == 'dashboard' %}
+                text-primary bg-primary-light dark:bg-primary/20 dark:text-primary-light
+              {% else %}
+                hover:bg-gray-100 dark:hover:bg-white/10
+              {% endif %}"
             >
               <span class="material-symbols-outlined fill">dashboard</span>
-              <p class="text-sm font-semibold">Dashboard</p>
+              <p class="text-sm font-medium">Dashboard</p>
             </a>
             <a
               class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
@@ -127,8 +132,13 @@
           class="flex flex-col gap-1 border-t border-gray-200 dark:border-gray-700 pt-4"
         >
           <a
-            class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
-            href="#"
+            href="{% url 'users:profile' %}"
+            class="flex items-center gap-3 rounded-lg px-3 py-2 
+            {% if request.resolver_match.url_name == 'profile' %}
+              bg-primary-light dark:bg-primary/20 dark:text-primary-light
+            {% else %}
+              hover:bg-gray-100 dark:hover:bg-white/10
+            {% endif %}"
           >
             <span class="material-symbols-outlined">settings</span>
             <p class="text-sm font-medium">Configuración</p>
