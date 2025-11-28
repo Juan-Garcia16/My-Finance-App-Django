@@ -8,7 +8,7 @@ from .models import Profile
 
 
 class CustomLoginView(LoginView):
-	template_name = 'login.html'
+	template_name = 'users/login.html'
 
 
 class CustomLogoutView(LogoutView):
@@ -25,7 +25,7 @@ def register_view(request):
 			return redirect('users:dashboard')
 	else:
 		form = UserRegisterForm()
-	return render(request, 'register.html', {'form': form})
+	return render(request, 'users/register.html', {'form': form})
 
 
 @login_required
