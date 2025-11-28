@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex-1 p-8 overflow-y-auto">
+  <div class="max-w-7xl mx-auto">
+    <!-- PageHeading -->
+    <div class="flex flex-wrap justify-between gap-3 mb-8">
+      <p
+        class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72"
+      >
+        Gestión de Categorías
+      </p>
+    </div>
+    <!-- Layout Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column: Create Category -->
+      <div class="lg:col-span-1">
+        <div
+          class="bg-white dark:bg-background-dark rounded-xl shadow-sm p-6"
+        >
+          <h3
+            class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4"
+          >
+            Crear Nueva Categoría
+          </h3>
+          <div class="flex flex-col gap-4">
+            {% if messages %}
+              <div class="mb-4">
+                {% for message in messages %}
+                  {% if 'categories' in message.tags %}
+                    <div class="p-3 rounded {% if 'success' in message.tags %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ message }}</div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <form method="post" action="{% if editing %}{% url 'categories:edit' editing_pk %}{% else %}{% url 'categories:list' %}{% endif %}">
+              {% csrf_token %}
+              {% if form.non_field_errors %}
+                <div class="text-red-600 text-sm">{{ form.non_field_errors }}</div>
+              {% endif %}
+              <label class="flex flex-col w-full">
+                <p class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal pb-2">Nombre de la Categoría</p>
+                {{ form.nombre }}
+                {% if form.nombre.errors %}
+                  <div class="text-red-600 text-sm">{{ form.nombre.errors|join:", " }}</div>
+                {% endif %}
+              </label>
+              <label class="flex flex-col w-full">
+                <p class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal pb-2">Tipo</p>
+                {{ form.tipo }}
+              </label>
+              <label class="flex items-center gap-3 w-full">
+                <span class="text-sm text-gray-600 dark:text-gray-300">Color</span>
+                {{ form.color }}
+              </label>
+              <div class="pt-2">
+                <button name="create_category" type="submit" class="flex items-center justify-center gap-2 w-full bg-primary text-white font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
+                  <span class="material-symbols-outlined">add_circle</span>
+                  <span>{% if editing %}Actualizar Categoría{% else %}Agregar Categoría{% endif %}</span>
+                </button>
+                {% if editing %}
+                  <a href="{% url 'categories:list' %}" class="block mt-2 text-center text-sm text-gray-600">Cancelar edición</a>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Right Column: Existing Categories -->
+      <div class="lg:col-span-2">
+        <div
+          class="bg-white dark:bg-background-dark rounded-xl shadow-sm overflow-hidden"
+        >
+          <h3
+            class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] p-6 border-b border-gray-200 dark:border-gray-800"
+          >
+            Categorías Existentes
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead class="bg-gray-50 dark:bg-gray-800/30">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider"
+                  >
+                    Nombre
+                  </th>
+                  <th
+                    class="px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right"
+                  >
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="divide-y divide-gray-200 dark:divide-gray-800"
+              >
+                {% for cat in categories %}
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ cat.nombre }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex justify-end gap-4 items-center">
+                      <a href="{% url 'categories:edit' cat.pk %}" class="text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400" title="Editar">
+                        <span class="material-symbols-outlined">edit</span>
+                      </a>
+                      <form method="post" action="{% url 'categories:delete' cat.pk %}" onsubmit="return confirm('Eliminar categoría {{ cat.nombre }}?');">
+                        {% csrf_token %}
+                        <button type="submit" class="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400" title="Eliminar">
+                          <span class="material-symbols-outlined">delete</span>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="2" class="px-6 py-4 text-sm text-gray-600">No hay categorías todavía.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

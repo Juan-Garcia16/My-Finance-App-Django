@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<main class="flex-1 p-8 pb-16 bg-background-light dark:bg-background-dark mb-8">
+<div class="flex-1 p-8 pb-16 bg-background-light dark:bg-background-dark mb-8">
   <div class="max-w-4xl mx-auto px-8 pb-16">
     <!-- PageHeading -->
     <div class="flex flex-wrap justify-between gap-3 pb-8">
@@ -21,7 +21,9 @@
         {% if messages %}
           <div class="mb-4">
             {% for message in messages %}
-              <div class="p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ message }}</div>
+              {% if 'categories' not in message.tags %}
+                <div class="p-3 rounded {% if 'success' in message.tags %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ message }}</div>
+              {% endif %}
             {% endfor %}
           </div>
         {% endif %}
@@ -90,10 +92,10 @@
           </label>
         </div>
         <div class="flex justify-end pt-8">
-          <button type="submit" class="flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-primary text-[#112116] text-base font-bold leading-normal">Guardar Cambios</button>
+          <button type="submit" class="flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-primary text-white font-bold leading-normal">Guardar Cambios</button>
         </div>
       </form>
     </div>
   </div>
-</main>
+</div>
 {% endblock %}
