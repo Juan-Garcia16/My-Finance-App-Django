@@ -113,7 +113,7 @@
             <a
               href="{% url 'categories:list' %}"
               class="flex items-center gap-3 rounded-lg px-3 py-2 
-              {% if request.resolver_match.url_name == 'categories' %}
+              {% if request.resolver_match.namespace == 'categories' %}
                 text-primary bg-primary-light dark:bg-primary/20 dark:text-primary-light
               {% else %}
                 hover:bg-gray-100 dark:hover:bg-white/10

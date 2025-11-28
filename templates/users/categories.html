@@ -3,127 +3,202 @@
 {% block content %}
 <div class="flex-1 p-8 overflow-y-auto">
   <div class="max-w-7xl mx-auto">
-    <!-- PageHeading -->
-    <div class="flex flex-wrap justify-between gap-3 mb-8">
-      <p
-        class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72"
-      >
-        Gestión de Categorías
-      </p>
+    <!-- Page Heading -->
+    <div class="flex items-center justify-between gap-3 mb-8">
+      <p class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Gestión de Categorías</p>
+      <div class="flex items-center gap-3">
+        <button id="open-create-modal" class="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary">
+          <span class="material-symbols-outlined">add</span>
+          <span>Nueva Categoría</span>
+        </button>
+      </div>
     </div>
-    <!-- Layout Container -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Left Column: Create Category -->
-      <div class="lg:col-span-1">
-        <div
-          class="bg-white dark:bg-background-dark rounded-xl shadow-sm p-6"
-        >
-          <h3
-            class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4"
-          >
-            Crear Nueva Categoría
-          </h3>
-          <div class="flex flex-col gap-4">
-            {% if messages %}
-              <div class="mb-4">
-                {% for message in messages %}
-                  {% if 'categories' in message.tags %}
-                    <div class="p-3 rounded {% if 'success' in message.tags %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ message }}</div>
-                  {% endif %}
-                {% endfor %}
-              </div>
-            {% endif %}
 
-            <form method="post" action="{% if editing %}{% url 'categories:edit' editing_pk %}{% else %}{% url 'categories:list' %}{% endif %}">
+    <!-- Messages (scoped to categories) -->
+    {% if messages %}
+      <div class="mb-6">
+        {% for message in messages %}
+          {% if 'categories' in message.tags %}
+            {% if 'success' in message.tags %}
+              <div class="inline-block mr-2 p-2 rounded bg-green-100 text-green-800">{{ message }}</div>
+            {% else %}
+              <div class="inline-block mr-2 p-2 rounded bg-red-100 text-red-800">{{ message }}</div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Grid of category cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {% for cat in categories %}
+        <div class="rounded-lg shadow-md overflow-hidden transform hover:-translate-y-1 transition" role="group"
+             data-cat-id="{{ cat.pk }}"
+             data-cat-nombre="{{ cat.nombre|escape }}"
+             data-cat-tipo="{{ cat.tipo }}"
+             data-cat-color="{{ cat.color|escape }}"
+             data-cat-edit-url="{% url 'categories:edit' cat.pk %}">
+          <div class="h-28 category-banner" data-color="{{ cat.color|escape }}"></div>
+          <div class="p-4 bg-white dark:bg-background-dark">
+            <div class="flex flex-col">
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ cat.nombre }}</p>
+              <div class="flex items-center justify-between mt-2">
+                <p class="text-sm text-gray-600 dark:text-gray-400">{{ cat.get_tipo_display }}</p>
+                <div class="flex items-center gap-2">
+                  <a href="#" class="js-open-edit-modal text-gray-500 hover:text-blue-500 dark:text-gray-400" title="Editar">
+                    <span class="material-symbols-outlined">edit</span>
+                  </a>
+                  <form method="post" action="{% url 'categories:delete' cat.pk %}" onsubmit="return confirm('Eliminar categoría {{ cat.nombre }}?');">
+                    {% csrf_token %}
+                    <button type="submit" class="text-gray-500 hover:text-red-500 dark:text-gray-400" title="Eliminar">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-span-full p-6 bg-white dark:bg-background-dark rounded-lg text-gray-600">No hay categorías todavía. Crea la primera con "Nueva Categoría".</div>
+      {% endfor %}
+    </div>
+
+    <!-- Create Category Modal -->
+    <div id="create-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+      <div class="absolute inset-0 bg-black/50" id="modal-backdrop"></div>
+      <div class="relative w-full max-w-md mx-auto p-4">
+        <div class="bg-white dark:bg-background-dark rounded-lg shadow-lg overflow-hidden">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 id="modal-title" class="text-lg font-bold text-gray-900 dark:text-white">Nueva Categoría</h3>
+              <button id="close-create-modal" class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+
+            <form id="category-form" method="post" action="{% url 'categories:list' %}">
               {% csrf_token %}
               {% if form.non_field_errors %}
-                <div class="text-red-600 text-sm">{{ form.non_field_errors }}</div>
+                <div class="text-red-600 text-sm mb-2">{{ form.non_field_errors }}</div>
               {% endif %}
-              <label class="flex flex-col w-full">
-                <p class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal pb-2">Nombre de la Categoría</p>
-                {{ form.nombre }}
-                {% if form.nombre.errors %}
-                  <div class="text-red-600 text-sm">{{ form.nombre.errors|join:", " }}</div>
-                {% endif %}
-              </label>
-              <label class="flex flex-col w-full">
-                <p class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal pb-2">Tipo</p>
-                {{ form.tipo }}
-              </label>
-              <label class="flex items-center gap-3 w-full">
-                <span class="text-sm text-gray-600 dark:text-gray-300">Color</span>
-                {{ form.color }}
-              </label>
-              <div class="pt-2">
-                <button name="create_category" type="submit" class="flex items-center justify-center gap-2 w-full bg-primary text-white font-semibold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark">
-                  <span class="material-symbols-outlined">add_circle</span>
-                  <span>{% if editing %}Actualizar Categoría{% else %}Agregar Categoría{% endif %}</span>
-                </button>
-                {% if editing %}
-                  <a href="{% url 'categories:list' %}" class="block mt-2 text-center text-sm text-gray-600">Cancelar edición</a>
-                {% endif %}
+              <div class="flex flex-col gap-3">
+                <label class="flex flex-col">
+                  <span class="text-sm text-gray-700 dark:text-gray-300 mb-1">Nombre</span>
+                  {{ form.nombre }}
+                  {% if form.nombre.errors %}<div class="text-red-600 text-sm">{{ form.nombre.errors|join:", " }}</div>{% endif %}
+                </label>
+                <label class="flex flex-col">
+                  <span class="text-sm text-gray-700 dark:text-gray-300 mb-1">Tipo</span>
+                  {{ form.tipo }}
+                </label>
+                <label class="flex items-center gap-3">
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Color</span>
+                  {{ form.color }}
+                </label>
+              </div>
+
+              <div class="mt-4 flex gap-3">
+                <button id="category-submit" type="submit" name="create_category" class="flex-1 bg-primary text-white py-2 rounded hover:bg-primary/90">Agregar</button>
+                <button type="button" id="cancel-modal" class="flex-1 border border-gray-200 py-2 rounded hover:bg-gray-100" aria-label="Cancelar">Cancelar</button>
               </div>
             </form>
           </div>
         </div>
       </div>
-      <!-- Right Column: Existing Categories -->
-      <div class="lg:col-span-2">
-        <div
-          class="bg-white dark:bg-background-dark rounded-xl shadow-sm overflow-hidden"
-        >
-          <h3
-            class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] p-6 border-b border-gray-200 dark:border-gray-800"
-          >
-            Categorías Existentes
-          </h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 dark:bg-gray-800/30">
-                <tr>
-                  <th
-                    class="px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Nombre
-                  </th>
-                  <th
-                    class="px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider text-right"
-                  >
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody
-                class="divide-y divide-gray-200 dark:divide-gray-800"
-              >
-                {% for cat in categories %}
-                <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ cat.nombre }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div class="flex justify-end gap-4 items-center">
-                      <a href="{% url 'categories:edit' cat.pk %}" class="text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400" title="Editar">
-                        <span class="material-symbols-outlined">edit</span>
-                      </a>
-                      <form method="post" action="{% url 'categories:delete' cat.pk %}" onsubmit="return confirm('Eliminar categoría {{ cat.nombre }}?');">
-                        {% csrf_token %}
-                        <button type="submit" class="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400" title="Eliminar">
-                          <span class="material-symbols-outlined">delete</span>
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="2" class="px-6 py-4 text-sm text-gray-600">No hay categorías todavía.</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
+
   </div>
 </div>
+
+<script>
+  // Aplicar color (gradient + color) desde data-color para evitar warnings del editor
+  (function(){
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.category-banner').forEach(function(el){
+        const color = el.dataset.color || '#e5e7eb';
+        // Si el color parece inválido, lo normalizamos como fallback
+        try{
+          el.style.background = `linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.05)), ${color}`;
+        }catch(e){
+          el.style.background = '#e5e7eb';
+        }
+      });
+    });
+  })();
+</script>
+
+<script>
+  // Restaurar funcionalidad: abrir modal en modo edición y rellenar campos
+  (function(){
+    document.addEventListener('DOMContentLoaded', function(){
+      const editButtons = document.querySelectorAll('.js-open-edit-modal');
+      editButtons.forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          const card = btn.closest('[data-cat-id]');
+          if(!card) return;
+          const editUrl = card.dataset.catEditUrl;
+          const nombre = card.dataset.catNombre || '';
+          const tipo = card.dataset.catTipo || '';
+          const color = card.dataset.catColor || '';
+
+          const form = document.getElementById('category-form');
+          if(!form) return;
+          form.action = editUrl;
+          const nameInput = form.querySelector('[name="nombre"]'); if(nameInput) nameInput.value = nombre;
+          const tipoInput = form.querySelector('[name="tipo"]'); if(tipoInput) tipoInput.value = tipo;
+          const colorInput = form.querySelector('[name="color"]'); if(colorInput) colorInput.value = color;
+
+          const submitBtn = document.getElementById('category-submit'); if(submitBtn) submitBtn.textContent = 'Actualizar';
+          const title = document.getElementById('modal-title'); if(title) title.textContent = 'Editar Categoría';
+
+          // open modal (reuse modal opening function)
+          const modal = document.getElementById('create-modal');
+          if(modal){ modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.classList.add('overflow-hidden'); }
+        });
+      });
+    });
+  })();
+</script>
+
+<script>
+  // Control básico del modal: abrir (crear), cerrar (✕), cancelar, backdrop y Escape
+  (function(){
+    document.addEventListener('DOMContentLoaded', function(){
+      const openBtn = document.getElementById('open-create-modal');
+      const modal = document.getElementById('create-modal');
+      const closeBtn = document.getElementById('close-create-modal');
+      const cancelBtn = document.getElementById('cancel-modal');
+      const backdrop = document.getElementById('modal-backdrop');
+      const form = document.getElementById('category-form');
+      const submitBtn = document.getElementById('category-submit');
+      const title = document.getElementById('modal-title');
+
+      function openModal(){ if(modal){ modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.classList.add('overflow-hidden'); } }
+      function closeModal(){ if(modal){ modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.classList.remove('overflow-hidden'); } }
+
+      if(openBtn){
+        openBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          // modo crear: resetear formulario y action
+          if(form){
+            form.action = "{% url 'categories:list' %}";
+            const nameInput = form.querySelector('[name="nombre"]'); if(nameInput) nameInput.value = '';
+            const tipoInput = form.querySelector('[name="tipo"]'); if(tipoInput) tipoInput.value = '';
+            const colorInput = form.querySelector('[name="color"]'); if(colorInput) colorInput.value = '';
+          }
+          if(submitBtn) submitBtn.textContent = 'Agregar';
+          if(title) title.textContent = 'Nueva Categoría';
+          openModal();
+        });
+      }
+
+      if(closeBtn) closeBtn.addEventListener('click', function(e){ e.preventDefault(); closeModal(); });
+      if(cancelBtn) cancelBtn.addEventListener('click', function(e){ e.preventDefault(); closeModal(); });
+      if(backdrop) backdrop.addEventListener('click', function(e){ e.preventDefault(); closeModal(); });
+
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeModal(); } });
+    });
+  })();
+</script>
+
 {% endblock %}
