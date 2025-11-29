@@ -97,8 +97,13 @@
               <p class="text-sm font-medium">Dashboard</p>
             </a>
             <a
-              class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
-              href="#"
+              href="{% url 'transactions:list' %}"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 
+              {% if request.resolver_match.namespace == 'transactions' %}
+                text-primary bg-primary-light dark:bg-primary/20 dark:text-primary-light
+              {% else %}
+                hover:bg-gray-100 dark:hover:bg-white/10
+              {% endif %}"
             >
               <span class="material-symbols-outlined">receipt_long</span>
               <p class="text-sm font-medium">Transacciones</p>

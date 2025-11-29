@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-1 justify-center py-10">
+  <div class="w-full max-w-2xl bg-white dark:bg-background-dark rounded-lg p-6 shadow">
+    <h2 class="text-2xl font-bold mb-4">{% if editing %}Editar Transacción{% else %}Nueva Transacción{% endif %}</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="flex flex-col gap-4">
+        <label class="flex flex-col">
+          <span class="text-sm text-gray-700 dark:text-gray-300">Tipo</span>
+          {{ form.tipo }}
+        </label>
+        <label class="flex flex-col">
+          <span class="text-sm text-gray-700 dark:text-gray-300">Categoría</span>
+          {{ form.categoria }}
+        </label>
+        <label class="flex flex-col">
+          <span class="text-sm text-gray-700 dark:text-gray-300">Monto</span>
+          {{ form.monto }}
+        </label>
+        <label class="flex flex-col">
+          <span class="text-sm text-gray-700 dark:text-gray-300">Fecha</span>
+          {{ form.fecha }}
+        </label>
+        <label class="flex flex-col">
+          <span class="text-sm text-gray-700 dark:text-gray-300">Descripción</span>
+          {{ form.descripcion }}
+        </label>
+      </div>
+      <div class="mt-4 flex gap-3">
+        <button type="submit" class="bg-primary text-white py-2 px-4 rounded">{% if editing %}Actualizar{% else %}Agregar{% endif %}</button>
+        <a href="{% url 'transactions:list' %}" class="border px-4 py-2 rounded">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<div class="flex flex-1 justify-center py-5">
+  <div
+    class="layout-content-container flex flex-col w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8"
+  >
+    <div class="flex flex-wrap items-center justify-between gap-4 py-6">
+      <div class="flex min-w-72 flex-col gap-2">
+        <p
+          class="text-[#34495e] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]"
+        >
+          Transacciones
+        </p>
+        <p
+          class="text-[#636f88] dark:text-gray-400 text-base font-normal leading-normal"
+        >
+          Visualiza y gestiona tus movimientos financieros.
+        </p>
+      </div>
+      <a href="{% url 'transactions:create' %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-colors">
+        <span class="material-symbols-outlined">add</span>
+        <span class="truncate">Agregar Transacción</span>
+      </a>
+    </div>
+    <div class="flex flex-col gap-4 py-3">
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex-grow">
+          <label class="flex flex-col min-w-40 h-12 w-full">
+            <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+              <div
+                class="text-[#636f88] dark:text-gray-400 flex border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark items-center justify-center pl-4 rounded-l-lg border-r-0"
+              >
+                <span class="material-symbols-outlined">search</span>
+              </div>
+              <input
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#34495e] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark h-full placeholder:text-[#636f88] dark:placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                placeholder="Buscar transacciones..."
+                value=""
+              />
+            </div>
+          </label>
+        </div>
+        <div class="flex gap-3 overflow-x-auto">
+          <button
+            class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <p
+              class="text-[#34495e] dark:text-gray-300 text-sm font-medium leading-normal"
+            >
+              Rango de Fechas
+            </p>
+            <span class="material-symbols-outlined text-lg">expand_more</span>
+          </button>
+          <button
+            class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <p
+              class="text-[#34495e] dark:text-gray-300 text-sm font-medium leading-normal"
+            >
+              Categoría
+            </p>
+            <span class="material-symbols-outlined text-lg">expand_more</span>
+          </button>
+          <button
+            class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <p
+              class="text-[#34495e] dark:text-gray-300 text-sm font-medium leading-normal"
+            >
+              Tipo
+            </p>
+            <span class="material-symbols-outlined text-lg">expand_more</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="py-3 @container">
+      <div
+        class="flex overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark"
+      >
+        <table class="w-full table-fixed">
+          <thead>
+            <tr class="bg-gray-50 dark:bg-gray-800/50">
+              <th
+                class="px-6 py-4 text-left text-[#34495e] dark:text-gray-300 text-xs font-medium uppercase tracking-wider"
+              >
+                Tipo
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[#34495e] dark:text-gray-300 text-xs font-medium uppercase tracking-wider"
+              >
+                Categoría
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[#34495e] dark:text-gray-300 text-xs font-medium uppercase tracking-wider"
+              >
+                Monto
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[#34495e] dark:text-gray-300 text-xs font-medium uppercase tracking-wider"
+              >
+                Fecha
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[#34495e] dark:text-gray-300 text-xs font-medium uppercase tracking-wider"
+              >
+                Descripción
+              </th>
+              <th
+                class="px-6 py-4 text-left text-[#34495e] dark:text-gray-300 text-xs font-medium uppercase tracking-wider"
+              >
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tx in transactions %}
+            <tr class="border-t border-t-gray-200 dark:border-t-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40">
+              <td class="h-[72px] px-6 py-4 whitespace-nowrap">
+                {% if tx.tipo_transaccion == 'ingreso' %}
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#27ae60]/10 text-[#27ae60]">Ingreso</span>
+                {% else %}
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">Gasto</span>
+                {% endif %}
+              </td>
+              <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#34495e] dark:text-gray-300 text-sm font-normal">{{ tx.categoria.nombre }}</td>
+              <td class="h-[72px] px-6 py-4 whitespace-nowrap text-sm font-medium {% if tx.tipo_transaccion == 'ingreso' %}text-[#27ae60]{% else %}text-red-600{% endif %}">
+                {% if tx.tipo_transaccion == 'ingreso' %}+{{ tx.monto }}{% else %}-{{ tx.monto }}{% endif %}
+              </td>
+              <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#636f88] dark:text-gray-400 text-sm font-normal">{{ tx.fecha }}</td>
+              <td class="h-[72px] px-6 py-4 text-[#636f88] dark:text-gray-400 text-sm font-normal">
+                <div class="truncate max-w-full" title="{{ tx.descripcion }}">{{ tx.descripcion }}</div>
+              </td>
+              <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#636f88] dark:text-gray-400 text-sm font-bold leading-normal tracking-[0.015em]">
+                <div class="flex items-center gap-4">
+                  <a href="{% url 'transactions:edit' tx.tipo_transaccion tx.pk %}" class="text-[#34495e] dark:text-gray-300 hover:text-primary dark:hover:text-white">
+                    <span class="material-symbols-outlined text-xl">edit</span>
+                  </a>
+                  <form method="post" action="{% url 'transactions:delete' tx.tipo_transaccion tx.pk %}" onsubmit="return confirm('Eliminar transacción?');">
+                    {% csrf_token %}
+                    <button type="submit" class="text-[#34495e] dark:text-gray-300 hover:text-red-500">
+                      <span class="material-symbols-outlined text-xl">delete</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="px-6 py-4 text-sm text-gray-600">No hay transacciones todavía.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
