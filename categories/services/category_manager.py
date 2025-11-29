@@ -26,13 +26,15 @@ class CategoryManager:
         return Category.objects.filter(usuario=self.usuario, tipo=tipo)
 
     # Editar categoría
-    def editar_categoria(self, categoria_id, nuevo_nombre=None, nuevo_color=None):
+    def editar_categoria(self, categoria_id, nuevo_nombre=None, nuevo_color=None, nuevo_tipo=None):
         categoria = Category.objects.get(id=categoria_id, usuario=self.usuario)
 
         if nuevo_nombre:
             categoria.nombre = nuevo_nombre
         if nuevo_color:
             categoria.color = nuevo_color
+        if nuevo_tipo:
+            categoria.tipo = nuevo_tipo
 
         categoria.save()
         return categoria
@@ -42,8 +44,11 @@ class CategoryManager:
         categoria = Category.objects.get(id=categoria_id, usuario=self.usuario)
 
         # Regla de negocio:
-        # No permitir eliminar categoría que tenga transacciones o presupuestos
-        if categoria.transaccion_set.exists() or categoria.presupuesto_set.exists():
+        # No permitir eliminar categoría que tenga transacciones (Ingresos/Gastos) o presupuestos
+        has_ingresos = hasattr(categoria, 'ingreso_set') and categoria.ingreso_set.exists()
+        has_gastos = hasattr(categoria, 'gasto_set') and categoria.gasto_set.exists()
+        has_presupuestos = hasattr(categoria, 'presupuesto_set') and categoria.presupuesto_set.exists()
+        if has_ingresos or has_gastos or has_presupuestos:
             raise ValueError("No se puede eliminar esta categoría porque tiene registros asociados.")
 
         categoria.delete()
