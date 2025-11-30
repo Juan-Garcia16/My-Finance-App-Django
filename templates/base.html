@@ -69,10 +69,10 @@
   <body
     class="font-display bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark"
   >
-    <div class="flex h-screen w-full">
+    <div class="flex min-h-screen w-full">
       <!-- SideNavBar -->
       <aside
-        class="flex h-full w-64 flex-col justify-between bg-surface dark:bg-surface-dark p-4 transition-all duration-300"
+        class="flex sticky top-0 h-screen w-64 flex-col justify-between bg-surface dark:bg-surface-dark p-4 transition-all duration-300"
       >
         <div class="flex flex-col gap-6">
           <div class="flex items-center gap-3 px-2">
@@ -203,7 +203,7 @@
           </div>
         </header>
         <!-- Page Content -->
-        <main class="flex flex-1 overflow-y-auto">
+        <main class="flex-1 min-w-0">
           {% block content %}
           {% endblock %}
         </main>
