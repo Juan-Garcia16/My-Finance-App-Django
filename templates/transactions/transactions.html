@@ -5,13 +5,13 @@
   <div
     class="layout-content-container flex flex-col w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8 min-w-0"
   >
-    <div class="flex flex-wrap items-center justify-between gap-4 py-6">
+    <div class="flex flex-wrap items-center justify-between gap-4 py-6 pt-2">
       <div class="flex min-w-72 flex-col gap-2">
-        <p
+        <h2
           class="text-[#34495e] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]"
         >
           Transacciones
-        </p>
+      </h2>
         <p
           class="text-[#636f88] dark:text-gray-400 text-base font-normal leading-normal"
         >
@@ -28,50 +28,40 @@
         <div class="flex-grow">
           <label class="flex flex-col min-w-40 h-12 w-full">
             <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
-              <div
-                class="text-[#636f88] dark:text-gray-400 flex border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark items-center justify-center pl-4 rounded-l-lg border-r-0"
-              >
+              <div class="text-[#636f88] dark:text-gray-400 flex border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark items-center justify-center pl-4 rounded-l-lg border-r-0">
                 <span class="material-symbols-outlined">search</span>
               </div>
-              <input
-                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#34495e] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark h-full placeholder:text-[#636f88] dark:placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+              <input id="tx-search"
+                class="form-input flex w-full min-w-0 max-w-[520px] flex-1 resize-none overflow-hidden rounded-lg text-[#34495e] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark h-full placeholder:text-[#636f88] dark:placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
                 placeholder="Buscar transacciones..."
                 value=""
               />
             </div>
           </label>
         </div>
-        <div class="flex gap-3 overflow-x-auto">
-          <button
-            class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <p
-              class="text-[#34495e] dark:text-gray-300 text-sm font-medium leading-normal"
-            >
-              Rango de Fechas
-            </p>
-            <span class="material-symbols-outlined text-lg">expand_more</span>
-          </button>
-          <button
-            class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <p
-              class="text-[#34495e] dark:text-gray-300 text-sm font-medium leading-normal"
-            >
-              Categoría
-            </p>
-            <span class="material-symbols-outlined text-lg">expand_more</span>
-          </button>
-          <button
-            class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <p
-              class="text-[#34495e] dark:text-gray-300 text-sm font-medium leading-normal"
-            >
-              Tipo
-            </p>
-            <span class="material-symbols-outlined text-lg">expand_more</span>
-          </button>
+        <div class="flex gap-3 overflow-x-auto items-center">
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-[#34495e] dark:text-gray-300">Desde</label>
+            <input id="tx-date-from" type="date" class="rounded-lg border border-gray-200 dark:border-gray-700 px-2 py-1 bg-white dark:bg-background-dark text-sm" />
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-[#34495e] dark:text-gray-300">Hasta</label>
+            <input id="tx-date-to" type="date" class="rounded-lg border border-gray-200 dark:border-gray-700 px-2 py-1 bg-white dark:bg-background-dark text-sm" />
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="tx-category-filter" class="text-sm text-[#34495e] dark:text-gray-300">Categoría</label>
+            <select id="tx-category-filter" class="rounded-lg border border-gray-200 dark:border-gray-700 px-2 py-1 bg-white dark:bg-background-dark text-sm min-w-[140px]">
+              <option value="">Todas</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="tx-type-filter" class="text-sm text-[#34495e] dark:text-gray-300">Tipo</label>
+            <select id="tx-type-filter" class="rounded-lg border border-gray-200 dark:border-gray-700 px-2 py-1 bg-white dark:bg-background-dark text-sm min-w-[110px]">
+              <option value="">Todos</option>
+              <option value="ingreso">Ingreso</option>
+              <option value="gasto">Gasto</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -116,7 +106,13 @@
           </thead>
           <tbody>
             {% for tx in transactions %}
-            <tr class="border-t border-t-gray-200 dark:border-t-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40">
+            <tr class="border-t border-t-gray-200 dark:border-t-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/40"
+              data-categoria="{{ tx.categoria.nombre|escape }}"
+              data-tipo="{{ tx.tipo_transaccion }}"
+              data-fecha="{{ tx.fecha }}"
+              data-descripcion="{{ tx.descripcion|default:''|escape }}"
+              data-monto="{{ tx.monto }}"
+            >
               <td class="h-[72px] px-6 py-4 whitespace-nowrap">
                 {% if tx.tipo_transaccion == 'ingreso' %}
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#27ae60]/10 text-[#27ae60]">Ingreso</span>
@@ -124,7 +120,12 @@
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">Gasto</span>
                 {% endif %}
               </td>
-              <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#34495e] dark:text-gray-300 text-sm font-normal">{{ tx.categoria.nombre }}</td>
+              <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#34495e] dark:text-gray-300 text-sm font-normal">
+                <div class="flex items-center gap-3">
+                  <span class="w-3 h-3 rounded-full category-color" data-color="{{ tx.categoria.color|escape }}" aria-hidden="true" style="background: transparent;"></span>
+                  <span class="truncate">{{ tx.categoria.nombre }}</span>
+                </div>
+              </td>
               <td class="h-[72px] px-6 py-4 whitespace-nowrap text-sm font-medium {% if tx.tipo_transaccion == 'ingreso' %}text-[#27ae60]{% else %}text-red-600{% endif %}">
                 {% if tx.tipo_transaccion == 'ingreso' %}+{{ tx.monto }}{% else %}-{{ tx.monto }}{% endif %}
               </td>
@@ -157,4 +158,61 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.category-color').forEach(function(el){
+      var color = el.dataset.color;
+      if(color){
+        try{ el.style.background = color; }catch(e){}
+      }
+    });
+      // Build category filter options from table rows
+      const rows = Array.from(document.querySelectorAll('tbody tr[data-categoria]'));
+      const catSelect = document.getElementById('tx-category-filter');
+      const cats = new Set();
+      rows.forEach(r=>{ const c=r.dataset.categoria||''; if(c) cats.add(c); });
+      Array.from(cats).sort().forEach(c=>{
+        const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt);
+      });
+
+      const searchInput = document.getElementById('tx-search');
+      const typeSelect = document.getElementById('tx-type-filter');
+      const dateFrom = document.getElementById('tx-date-from');
+      const dateTo = document.getElementById('tx-date-to');
+
+      function parseDate(v){ if(!v) return null; const d=new Date(v); return isNaN(d)?null:d; }
+
+      function matchRow(r){
+        const s = (searchInput.value||'').trim().toLowerCase();
+        const cat = (catSelect.value||'').trim();
+        const tipo = (typeSelect.value||'').trim();
+        const from = parseDate(dateFrom.value);
+        const to = parseDate(dateTo.value);
+
+        const rc = (r.dataset.categoria||'').toLowerCase();
+        const rd = (r.dataset.descripcion||'').toLowerCase();
+        const rt = (r.dataset.tipo||'').toLowerCase();
+        const rf = r.dataset.fecha || '';
+
+        if(s){ if(!(rc.indexOf(s)!==-1 || rd.indexOf(s)!==-1 || (r.dataset.monto||'').indexOf(s)!==-1)) return false; }
+        if(cat){ if(rc !== cat.toLowerCase()) return false; }
+        if(tipo){ if(rt !== tipo.toLowerCase()) return false; }
+        if(from || to){
+          const d = parseDate(rf);
+          if(!d) return false;
+          if(from && d < from) return false;
+          if(to && d > to) return false;
+        }
+        return true;
+      }
+
+      function applyFilters(){
+        rows.forEach(r=>{ if(matchRow(r)) r.style.display=''; else r.style.display='none'; });
+      }
+
+      [searchInput, catSelect, typeSelect, dateFrom, dateTo].forEach(el=>{ if(el) el.addEventListener(el.tagName==='INPUT' && el.type==='text'? 'input':'change', applyFilters); if(el && el.tagName==='INPUT' && el.type==='text') el.addEventListener('input', applyFilters); });
+      // also filter on typing in search
+      if(searchInput) searchInput.addEventListener('input', applyFilters);
+  });
+</script>
 {% endblock %}
