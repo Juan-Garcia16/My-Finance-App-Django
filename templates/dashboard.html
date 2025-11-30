@@ -31,11 +31,11 @@
       >
         Balance Total
       </p>
-      <p
-        class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark"
-      >
-        ${{ profile.saldo_actual }}
-      </p>
+        <p
+          class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark"
+        >
+          ${{ saldo_actual_display }}
+        </p>
       <p class="text-base font-medium text-accent">+2.5%</p>
     </div>
     <div
@@ -46,9 +46,9 @@
       >
         Ingresos del Mes
       </p>
-      <p class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark">
-        ${{ ingresos_mes|floatformat:2 }}
-      </p>
+        <p class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark">
+          ${{ ingresos_mes_display }}
+        </p>
       <p class="text-base font-medium text-accent">+10.2%</p>
     </div>
     <div
@@ -59,9 +59,9 @@
       >
         Gastos del Mes
       </p>
-      <p class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark">
-        ${{ gastos_mes|floatformat:2 }}
-      </p>
+        <p class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark">
+          ${{ gastos_mes_display }}
+        </p>
       <p class="text-base font-medium text-danger">-5.1%</p>
     </div>
   </div>

@@ -11,6 +11,40 @@ from decimal import Decimal
 from django.db.models import Sum
 from django.utils import timezone
 from transactions.models import Ingreso, Gasto
+from decimal import ROUND_HALF_UP
+
+
+def format_cop(value):
+	"""Format a numeric/Decimal value as Colombian pesos display (no cents).
+
+	Examples:
+		Decimal('1100000.00') -> '1.100.000'
+	"""
+	if value is None:
+		return ''
+	try:
+		amt = Decimal(value)
+	except Exception:
+		try:
+			amt = Decimal(str(value))
+		except Exception:
+			return str(value)
+
+	# Round to whole pesos
+	try:
+		amt = amt.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+	except Exception:
+		pass
+
+	try:
+		s = "{:,.0f}".format(amt)
+	except Exception:
+		try:
+			s = "{:,.0f}".format(int(amt))
+		except Exception:
+			return str(value)
+
+	return s.replace(',', '.')
 
 
 class CustomLoginView(LoginView):
@@ -61,6 +95,10 @@ def dashboard_view(request):
 		'profile': profile,
 		'ingresos_mes': ingresos_total,
 		'gastos_mes': gastos_total,
+		# display versions (formatted as COP)
+		'saldo_actual_display': format_cop(profile.saldo_actual),
+		'ingresos_mes_display': format_cop(ingresos_total),
+		'gastos_mes_display': format_cop(gastos_total),
 	}
 	# Obtener últimas transacciones (ingresos + gastos) y ordenar por fecha descendente
 	ingresos_qs = Ingreso.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'monto', 'fecha', 'descripcion')
