@@ -135,7 +135,7 @@
               </td>
               <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#636f88] dark:text-gray-400 text-sm font-bold leading-normal tracking-[0.015em]">
                 <div class="flex items-center gap-4">
-                  <a href="{% url 'transactions:edit' tx.tipo_transaccion tx.pk %}" class="text-[#34495e] dark:text-gray-300 hover:text-primary dark:hover:text-white">
+                  <a href="{% url 'transactions:edit' tx.tipo_transaccion tx.pk %}" class="text-gray-500 hover:text-blue-500 dark:text-gray-400"">
                     <span class="material-symbols-outlined text-xl">edit</span>
                   </a>
                   <form method="post" action="{% url 'transactions:delete' tx.tipo_transaccion tx.pk %}" onsubmit="return confirm('Eliminar transacción?');">

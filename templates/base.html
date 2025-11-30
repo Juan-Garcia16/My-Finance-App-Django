@@ -97,25 +97,6 @@
               <p class="text-sm font-medium">Dashboard</p>
             </a>
             <a
-              href="{% url 'transactions:list' %}"
-              class="flex items-center gap-3 rounded-lg px-3 py-2 
-              {% if request.resolver_match.namespace == 'transactions' %}
-                text-primary bg-primary-light dark:bg-primary/20 dark:text-primary-light
-              {% else %}
-                hover:bg-gray-100 dark:hover:bg-white/10
-              {% endif %}"
-            >
-              <span class="material-symbols-outlined">receipt_long</span>
-              <p class="text-sm font-medium">Transacciones</p>
-            </a>
-            <a
-              class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
-              href="#"
-            >
-              <span class="material-symbols-outlined">pie_chart</span>
-              <p class="text-sm font-medium">Presupuestos</p>
-            </a>
-            <a
               href="{% url 'categories:list' %}"
               class="flex items-center gap-3 rounded-lg px-3 py-2 
               {% if request.resolver_match.namespace == 'categories' %}
@@ -128,6 +109,37 @@
                 >account_balance_wallet</span
               >
               <p class="text-sm font-medium">Categorías</p>
+            </a>
+            <a
+              href="{% url 'transactions:list' %}"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 
+              {% if request.resolver_match.namespace == 'transactions' %}
+                text-primary bg-primary-light dark:bg-primary/20 dark:text-primary-light
+              {% else %}
+                hover:bg-gray-100 dark:hover:bg-white/10
+              {% endif %}"
+            >
+              <span class="material-symbols-outlined">receipt_long</span>
+              <p class="text-sm font-medium">Transacciones</p>
+            </a>
+            <a
+              href="{% url 'goals:list' %}"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 
+              {% if request.resolver_match.namespace == 'goals' %}
+                text-primary bg-primary-light dark:bg-primary/20 dark:text-primary-light
+              {% else %}
+                hover:bg-gray-100 dark:hover:bg-white/10
+              {% endif %}"
+            >
+              <span class="material-symbols-outlined">flag_check</span>
+              <p class="text-sm font-medium">Metas de Ahorro</p>
+            </a>
+            <a
+              class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
+              href="#"
+            >
+              <span class="material-symbols-outlined">pie_chart</span>
+              <p class="text-sm font-medium">Presupuestos</p>
             </a>
             <a
               class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
