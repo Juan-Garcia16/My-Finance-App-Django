@@ -29,7 +29,7 @@ def budgets_list(request):
 			return redirect(reverse('budgets:list'))
 		else:
 			# render con errors y abrir modal en template
-			budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria')
+			budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria').order_by('-mes', '-pk')
 			# calcular estado
 			for p in budgets:
 				try:
@@ -45,7 +45,7 @@ def budgets_list(request):
 
 	# GET
 	form = BudgetForm(usuario=request.user.profile)
-	budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria')
+	budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria').order_by('-mes', '-pk')
 	exceeded_names = []
 	for p in budgets:
 		try:
@@ -87,7 +87,7 @@ def edit_budget(request, pk):
 			return redirect(reverse('budgets:list'))
 		else:
 			# render same template with modal open and errors
-			budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria')
+			budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria').order_by('-mes', '-pk')
 			for p in budgets:
 				try:
 					p.porcentaje = float(p.gasto_actual) / float(p.limite) * 100 if p.limite and p.limite != 0 else 0
@@ -101,7 +101,7 @@ def edit_budget(request, pk):
 			return render(request, 'budgets/budgets.html', {'budgets': budgets, 'form': form, 'open_modal': True, 'edit_pk': pk})
 	else:
 		form = BudgetForm(instance=presupuesto, usuario=profile)
-		budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria')
+		budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria').order_by('-mes', '-pk')
 		for p in budgets:
 			try:
 				p.porcentaje = float(p.gasto_actual) / float(p.limite) * 100 if p.limite and p.limite != 0 else 0
