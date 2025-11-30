@@ -127,7 +127,7 @@
                 </div>
               </td>
               <td class="h-[72px] px-6 py-4 whitespace-nowrap text-sm font-medium {% if tx.tipo_transaccion == 'ingreso' %}text-[#27ae60]{% else %}text-red-600{% endif %}">
-                {% if tx.tipo_transaccion == 'ingreso' %}+{{ tx.monto }}{% else %}-{{ tx.monto }}{% endif %}
+                {% if tx.tipo_transaccion == 'ingreso' %}+{{ tx.monto_display }}{% else %}-{{ tx.monto_display }}{% endif %}
               </td>
               <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#636f88] dark:text-gray-400 text-sm font-normal">{{ tx.fecha }}</td>
               <td class="h-[72px] px-6 py-4 text-[#636f88] dark:text-gray-400 text-sm font-normal">

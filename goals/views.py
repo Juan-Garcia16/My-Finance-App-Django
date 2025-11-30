@@ -10,6 +10,34 @@ from transactions.models import Ingreso
 import re
 from django.http import JsonResponse
 
+from decimal import ROUND_HALF_UP
+
+
+def _format_cop(value):
+    """Format a numeric/Decimal value as Colombian pesos display (no cents)."""
+    if value is None:
+        return ''
+    try:
+        amt = Decimal(value)
+    except Exception:
+        try:
+            amt = Decimal(str(value))
+        except Exception:
+            return str(value)
+
+    try:
+        amt = amt.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+    except Exception:
+        pass
+    try:
+        s = "{:,.0f}".format(amt)
+    except Exception:
+        try:
+            s = "{:,.0f}".format(int(amt))
+        except Exception:
+            return str(value)
+    return s.replace(',', '.')
+
 
 @login_required
 def list_goals(request):
@@ -18,6 +46,16 @@ def list_goals(request):
     contribution_form = ContributionForm()
     from .forms import GoalForm
     goal_form = GoalForm()
+    # attach formatted display strings to each goal
+    for g in goals:
+        try:
+            g.progreso_display = _format_cop(g.progreso)
+        except Exception:
+            g.progreso_display = str(g.progreso)
+        try:
+            g.monto_objetivo_display = _format_cop(g.monto_objetivo)
+        except Exception:
+            g.monto_objetivo_display = str(g.monto_objetivo)
     return render(request, 'goals/goals.html', {
         'goals': goals,
         'contribution_form': contribution_form,

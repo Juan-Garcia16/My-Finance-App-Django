@@ -31,8 +31,8 @@
       <div class="flex flex-col rounded-xl shadow-sm bg-white dark:bg-gray-900/50 p-6 border border-gray-200 dark:border-gray-800 min-w-0">
         <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ goal.nombre }}</p>
         <div class="flex items-baseline gap-2 mt-2">
-          <p class="text-gray-900 dark:text-white text-2xl font-bold leading-tight truncate">${{ goal.progreso|floatformat:2 }}</p>
-          <p class="text-neutral-text dark:text-dark-neutral-text text-base truncate">/ ${{ goal.monto_objetivo|floatformat:2 }}</p>
+          <p class="text-gray-900 dark:text-white text-2xl font-bold leading-tight truncate">${{ goal.progreso_display }}</p>
+          <p class="text-neutral-text dark:text-dark-neutral-text text-base truncate">/ ${{ goal.monto_objetivo_display }}</p>
         </div>
         <div class="mt-4 flex flex-col gap-2">
           <div class="relative h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">

@@ -7,6 +7,33 @@ from users.models import Profile
 from categories.models import Category
 from .forms import TransactionForm
 from .services.transaction_manager import TransactionManager
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def _format_cop(value):
+    """Format a numeric/Decimal value as Colombian pesos display (no cents)."""
+    if value is None:
+        return ''
+    try:
+        amt = Decimal(value)
+    except Exception:
+        try:
+            amt = Decimal(str(value))
+        except Exception:
+            return str(value)
+
+    try:
+        amt = amt.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+    except Exception:
+        pass
+    try:
+        s = "{:,.0f}".format(amt)
+    except Exception:
+        try:
+            s = "{:,.0f}".format(int(amt))
+        except Exception:
+            return str(value)
+    return s.replace(',', '.')
 
 
 @login_required
@@ -33,6 +60,12 @@ def transactions_list(request):
         form = TransactionForm(usuario=profile)
 
     transactions = manager.listar_transacciones()
+    # attach display string to each transaction for templates
+    for tx in transactions:
+        try:
+            tx.monto_display = _format_cop(tx.monto)
+        except Exception:
+            tx.monto_display = str(tx.monto)
     return render(request, 'transactions/transactions.html', {'form': form, 'transactions': transactions})
 
 

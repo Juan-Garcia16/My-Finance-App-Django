@@ -21,8 +21,8 @@
         {% if messages %}
           <div class="mb-4">
             {% for message in messages %}
-              {# Hide messages belonging to other scoped sections (categories, transactions) #}
-              {% if 'categories' not in message.tags and 'transactions' not in message.tags %}
+              {# Hide messages belonging to other scoped sections (categories, transactions, goals) #}
+              {% if 'categories' not in message.tags and 'transactions' not in message.tags and 'goals' not in message.tags %}
                 <div class="p-3 rounded {% if 'success' in message.tags %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ message }}</div>
               {% endif %}
             {% endfor %}
