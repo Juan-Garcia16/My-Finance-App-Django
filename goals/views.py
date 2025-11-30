@@ -8,6 +8,7 @@ from .forms import GoalForm, ContributionForm
 from .services.goal_manager import GoalManager
 from transactions.models import Ingreso
 import re
+from django.http import JsonResponse
 
 
 @login_required
@@ -15,9 +16,12 @@ def list_goals(request):
     profile = Profile.objects.get(user=request.user)
     goals = MetaAhorro.objects.filter(usuario=profile).order_by('fecha_limite')
     contribution_form = ContributionForm()
+    from .forms import GoalForm
+    goal_form = GoalForm()
     return render(request, 'goals/goals.html', {
         'goals': goals,
         'contribution_form': contribution_form,
+        'goal_form': goal_form,
     })
 
 
@@ -49,6 +53,17 @@ def edit_goal(request, pk):
             return redirect('goals:list')
     else:
         form = GoalForm(instance=goal)
+    # Si se solicita partial=1 devolvemos JSON con los datos de la meta (para rellenar el form inline)
+    if request.GET.get('partial') == '1':
+        data = {
+            'id': goal.id,
+            'nombre': goal.nombre,
+            'monto_objetivo': str(goal.monto_objetivo),
+            'fecha_limite': goal.fecha_limite.isoformat() if goal.fecha_limite else '',
+            'action': f"{request.scheme}://{request.get_host()}/goals/{goal.id}/edit/",
+        }
+        return JsonResponse(data)
+
     return render(request, 'goals/form.html', {'form': form, 'create': False, 'goal': goal})
 
 

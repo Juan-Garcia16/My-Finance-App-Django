@@ -18,10 +18,10 @@
           Visualiza y sigue el progreso de tus metas de ahorro.
         </p>
       </div>
-      <a href="{% url 'goals:create' %}" class="flex shrink-0 items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-background-dark">
+      <button id="open-goal-create" type="button" class="flex shrink-0 items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-background-dark">
         <span class="material-symbols-outlined">add</span>
         <span class="truncate">Crear Nueva Meta</span>
-      </a>
+      </button>
     </header>
     <div
       class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
@@ -29,14 +29,14 @@
       {% for goal in goals %}
       {% with percent=goal.porcentaje_progreso|floatformat:0 %}
       <div class="flex flex-col rounded-xl shadow-sm bg-white dark:bg-gray-900/50 p-6 border border-gray-200 dark:border-gray-800 min-w-0">
-        <p class="text-neutral-text dark:text-dark-neutral-text text-sm font-medium truncate">{{ goal.nombre }}</p>
+        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ goal.nombre }}</p>
         <div class="flex items-baseline gap-2 mt-2">
           <p class="text-gray-900 dark:text-white text-2xl font-bold leading-tight truncate">${{ goal.progreso|floatformat:2 }}</p>
           <p class="text-neutral-text dark:text-dark-neutral-text text-base truncate">/ ${{ goal.monto_objetivo|floatformat:2 }}</p>
         </div>
         <div class="mt-4 flex flex-col gap-2">
           <div class="relative h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-            <div class="absolute top-0 left-0 h-2 rounded-full bg-success" style="width: {{ percent }}%"></div>
+            <div class="absolute top-0 left-0 h-2 rounded-full bg-primary transition-all duration-300 ease-in-out" style="width: {{ percent }}%"></div>
           </div>
           <p class="text-right text-neutral-text dark:text-dark-neutral-text text-xs font-medium">{{ percent }}% completado</p>
         </div>
@@ -45,13 +45,13 @@
           <span class="text-gray-900 dark:text-white text-xs font-bold">{{ goal.fecha_limite|date:"M Y" }}</span>
         </div>
         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between gap-2">
-          <form method="post" action="{% url 'goals:contribute' goal.id %}" class="flex items-center gap-2">
+          <form method="post" action="{% url 'goals:contribute' goal.id %}" class="flex items-center gap-2" onsubmit="return confirmContribution(this, '{{ goal.nombre|escapejs }}')">
             {% csrf_token %}
             <input type="number" name="monto" step="0.01" min="0.01" placeholder="$" class="w-24 rounded-md border p-2" />
             <button type="submit" class="px-3 py-1 rounded-md bg-primary text-white text-sm">Aportar</button>
           </form>
           <div class="flex items-center gap-2">
-            <a href="{% url 'goals:edit' goal.id %}" title="Editar" class="text-gray-500 hover:text-blue-500 dark:text-gray-400"> 
+            <a href="#" data-id="{{ goal.id }}" class="open-goal-edit text-gray-500 hover:text-blue-500 dark:text-gray-400" title="Editar"> 
               <span class="material-symbols-outlined">edit</span>
             </a>
             <form method="post" action="{% url 'goals:delete' goal.id %}" onsubmit="return confirm('¿Eliminar la meta {{ goal.nombre }}? Esta acción no se puede deshacer.');">
@@ -70,4 +70,128 @@
     </div>
   </div>
 </div>
+
+  <!-- Modal: hidden by default -->
+  <div id="goal-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div id="goal-modal-overlay" class="absolute inset-0 bg-black/50"></div>
+    <div class="relative w-full max-w-2xl mx-auto p-6">
+      <div id="goal-modal-content">
+        <div class="bg-white dark:bg-gray-900/50 p-6 rounded-lg border border-gray-200 dark:border-gray-800">
+          <div class="mb-4">
+            <h3 id="goal-modal-title" class="text-xl font-bold">Crear Nueva Meta</h3>
+          </div>
+          <form method="post" id="goal-modal-form" action="{% url 'goals:create' %}">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 gap-4">
+              <div>
+                <label class="block text-sm font-medium">Nombre</label>
+                {{ goal_form.nombre }}
+                {% for err in goal_form.nombre.errors %}<p class="text-red-500 text-xs">{{ err }}</p>{% endfor %}
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Monto objetivo</label>
+                {{ goal_form.monto_objetivo }}
+                {% for err in goal_form.monto_objetivo.errors %}<p class="text-red-500 text-xs">{{ err }}</p>{% endfor %}
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Fecha límite</label>
+                {{ goal_form.fecha_limite }}
+                {% for err in goal_form.fecha_limite.errors %}<p class="text-red-500 text-xs">{{ err }}</p>{% endfor %}
+              </div>
+            </div>
+            <div class="mt-6 flex items-center gap-3">
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md">Guardar</button>
+              <button type="button" id="goal-modal-cancel" class="px-4 py-2 border rounded-md">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const modal = document.getElementById('goal-modal');
+      const overlay = document.getElementById('goal-modal-overlay');
+      const content = document.getElementById('goal-modal-content');
+      const openCreate = document.getElementById('open-goal-create');
+
+      function openModal(){ modal.classList.remove('hidden'); }
+      function closeModal(){ modal.classList.add('hidden'); }
+
+      // open create (the partial is already included)
+      if(openCreate){
+        openCreate.addEventListener('click', function(e){
+          e.preventDefault();
+          // reset form values and action to create
+          const form = document.getElementById('goal-modal-form');
+          if(form){
+            form.action = `{% url 'goals:create' %}`;
+            const nombre = form.querySelector('[name="nombre"]');
+            const monto = form.querySelector('[name="monto_objetivo"]');
+            const fecha = form.querySelector('[name="fecha_limite"]');
+            if(nombre) nombre.value = '';
+            if(monto) monto.value = '';
+            if(fecha) fecha.value = '';
+          }
+          const title = document.getElementById('goal-modal-title');
+          if(title) title.textContent = 'Crear Nueva Meta';
+          openModal();
+        });
+      }
+
+      // close on overlay click
+      if(overlay){ overlay.addEventListener('click', closeModal); }
+
+      // cancel button inside partial (delegation)
+      document.addEventListener('click', function(e){
+        if(e.target && (e.target.id === 'goal-modal-cancel' || e.target.closest('#goal-modal-cancel'))){
+          e.preventDefault(); closeModal();
+        }
+      });
+
+      // open edit: fetch partial and inject
+      document.querySelectorAll('.open-goal-edit').forEach(function(el){
+        el.addEventListener('click', function(evt){
+          evt.preventDefault();
+          const id = el.getAttribute('data-id');
+          if(!id) return;
+          fetch(`/goals/${id}/edit/?partial=1`, { credentials: 'same-origin' })
+            .then(resp => resp.json())
+            .then(data => {
+              // Rellenar el formulario inline ya presente en la página
+              const form = document.getElementById('goal-modal-form');
+              if(!form){ alert('Formulario no encontrado en la página.'); return; }
+              // establecer action a la ruta de edición
+              form.action = `/goals/${data.id}/edit/`;
+              const nombre = form.querySelector('[name="nombre"]');
+              const monto = form.querySelector('[name="monto_objetivo"]');
+              const fecha = form.querySelector('[name="fecha_limite"]');
+              if(nombre) nombre.value = data.nombre || '';
+              if(monto) monto.value = data.monto_objetivo || '';
+              if(fecha) fecha.value = data.fecha_limite || '';
+              const title = document.getElementById('goal-modal-title');
+              if(title) title.textContent = `Editar Meta — ${data.nombre || ''}`;
+              openModal();
+            }).catch(err => { console.error(err); alert('No se pudo cargar el formulario de edición.'); });
+        });
+      });
+
+      // close modal on ESC
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+    })();
+
+    // Confirm contribution before submitting the small form inside each card
+    function confirmContribution(form, goalName){
+      try{
+        const input = form.querySelector('[name="monto"]');
+        const raw = input ? input.value.trim() : '';
+        if(!raw){ alert('Introduce un monto válido'); return false; }
+        const num = Number(raw);
+        if(isNaN(num) || num <= 0){ alert('Introduce un monto válido mayor a 0'); return false; }
+        const formatted = num.toFixed(2);
+        return confirm(`¿Confirmas aportar $${formatted} a la meta "${goalName}"?`);
+      }catch(e){ console.error(e); return confirm('¿Confirmas el aporte a la meta?'); }
+    }
+  </script>
 {% endblock %}
