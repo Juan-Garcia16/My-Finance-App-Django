@@ -7,6 +7,10 @@ from .forms import UserUpdateForm, ProfileUpdateForm
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Profile
+from decimal import Decimal
+from django.db.models import Sum
+from django.utils import timezone
+from transactions.models import Ingreso, Gasto
 
 
 class CustomLoginView(LoginView):
@@ -42,7 +46,23 @@ def dashboard_view(request):
 			'saldo_actual': 0,
 		}
 	)
-	return render(request, 'dashboard.html', {'profile': profile})
+	# calcular totales del mes actual
+	now = timezone.now()
+	year = now.year
+	month = now.month
+
+	ingresos_agg = Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
+	gastos_agg = Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
+
+	ingresos_total = ingresos_agg['total'] or Decimal('0.00')
+	gastos_total = gastos_agg['total'] or Decimal('0.00')
+
+	context = {
+		'profile': profile,
+		'ingresos_mes': ingresos_total,
+		'gastos_mes': gastos_total,
+	}
+	return render(request, 'dashboard.html', context)
 
 @login_required
 def profile_view(request):

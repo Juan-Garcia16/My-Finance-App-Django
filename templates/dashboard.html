@@ -54,10 +54,8 @@
       >
         Ingresos del Mes
       </p>
-      <p
-        class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark"
-      >
-        $5,200.00
+      <p class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark">
+        ${{ ingresos_mes|floatformat:2 }}
       </p>
       <p class="text-base font-medium text-accent">+10.2%</p>
     </div>
@@ -69,10 +67,8 @@
       >
         Gastos del Mes
       </p>
-      <p
-        class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark"
-      >
-        $2,750.75
+      <p class="text-3xl font-bold tracking-tight text-text-main dark:text-text-main-dark">
+        ${{ gastos_mes|floatformat:2 }}
       </p>
       <p class="text-base font-medium text-danger">-5.1%</p>
     </div>

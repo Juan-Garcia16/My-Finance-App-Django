@@ -67,7 +67,7 @@
     </script>
   </head>
   <body
-    class="font-display bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark"
+    class="font-display bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark overscroll-none"
   >
     <div class="flex min-h-screen w-full">
       <!-- SideNavBar -->
@@ -166,7 +166,7 @@
       <div class="flex flex-1 flex-col">
         <!-- TopNavBar -->
         <header
-          class="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-surface dark:bg-surface-dark px-6"
+          class="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-surface dark:bg-surface-dark px-6"
         >
           <div class="flex flex-1 items-center">
             <label class="relative hidden md:block">
@@ -203,7 +203,7 @@
           </div>
         </header>
         <!-- Page Content -->
-        <main class="flex-1 min-w-0">
+        <main class="flex-1 min-w-0 overscroll-none">
           {% block content %}
           {% endblock %}
         </main>
