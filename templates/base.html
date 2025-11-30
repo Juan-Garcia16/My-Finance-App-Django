@@ -135,15 +135,20 @@
               <p class="text-sm font-medium">Metas de Ahorro</p>
             </a>
             <a
-              class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
               href="{% url 'budgets:list' %}"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 
+              {% if request.resolver_match.namespace == 'budgets' %}
+                text-primary bg-primary-light dark:bg-primary/20 dark:text-primary-light
+              {% else %}
+                hover:bg-gray-100 dark:hover:bg-white/10
+              {% endif %}"
             >
               <span class="material-symbols-outlined">pie_chart</span>
               <p class="text-sm font-medium">Presupuestos</p>
             </a>
             <a
               class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/10"
-              href="#"
+              href="{% url 'reports:index' %}"
             >
               <span class="material-symbols-outlined">bar_chart</span>
               <p class="text-sm font-medium">Reportes</p>

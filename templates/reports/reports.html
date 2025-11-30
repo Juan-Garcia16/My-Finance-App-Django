@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex-1 p-6 md:p-10">
+  <div class="mx-auto max-w-7xl">
+    <header class="mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex flex-col gap-1">
+          <h2 class="text-[#34495e] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Reportes</h2>
+          <p class="text-neutral-text dark:text-dark-neutral-text text-base font-normal leading-normal">Visualiza tus datos financieros para tomar mejores decisiones.</p>
+        </div>
+        <div class="flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 p-1">
+          <button class="px-3 py-1.5 rounded-md text-sm font-medium text-primary dark:text-white bg-gray-100 dark:bg-gray-800">Mensual</button>
+          <button class="px-3 py-1.5 rounded-md text-sm font-medium text-neutral-text dark:text-dark-neutral-text hover:bg-gray-100 dark:hover:bg-gray-800">Trimestral</button>
+          <button class="px-3 py-1.5 rounded-md text-sm font-medium text-neutral-text dark:text-dark-neutral-text hover:bg-gray-100 dark:hover:bg-gray-800">Anual</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Resumen card -->
+      <div class="flex flex-col rounded-xl shadow-sm bg-white dark:bg-gray-900/50 p-6 border border-gray-200 dark:border-gray-800">
+        <h2 class="text-lg font-bold text-primary dark:text-white">Vistazo rápido</h2>
+        <div class="mt-6 space-y-4">
+          <div class="flex justify-between items-center">
+            <p class="text-gray-800 dark:text-gray-200">Ingresos Totales</p>
+            <p class="text-accent font-bold text-lg">${{ ingresos_total|floatformat:0 }}</p>
+          </div>
+          <div class="flex justify-between items-center">
+            <p class="text-gray-800 dark:text-gray-200">Gastos Totales</p>
+            <p class="text-danger font-bold text-lg">${{ gastos_total|floatformat:0 }}</p>
+          </div>
+          <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+          <div class="flex justify-between items-center">
+            <p class="text-gray-800 dark:text-gray-200 font-semibold">Ahorro Neto</p>
+            <p class="text-base dark:text-white font-black text-xl">${{ neto|floatformat:0 }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col rounded-xl shadow-sm bg-white dark:bg-gray-900/50 p-6 border border-gray-200 dark:border-gray-800 md:col-span-2">
+        <h2 class="text-lg font-bold text-primary dark:text-white">
+          Gastos por Categoría
+        </h2>
+        <div class="mt-4 flex flex-1 items-center justify-center">
+          <div class="w-full h-72">
+            <canvas id="reports-pie-donut" class="w-full h-72"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col rounded-xl shadow-sm bg-white dark:bg-gray-900/50 p-6 border border-gray-200 dark:border-gray-800 col-span-2">
+        <h2 class="text-lg font-bold text-primary dark:text-white">
+          Ingresos por Categoría
+        </h2>
+        <div class="mt-4 flex flex-1 items-center justify-center">
+          <div class="w-full h-72">
+            <canvas id="reports-income-pie" class="w-full h-72"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col rounded-xl shadow-sm bg-white dark:bg-gray-900/50 p-6 border border-gray-200 dark:border-gray-800">
+        <h2 class="text-lg font-bold text-primary dark:text-white">
+          Estado de Presupuestos
+        </h2>
+        <div class="mt-6 space-y-5">
+          {% for p in presupuestos %}
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="font-medium text-gray-800 dark:text-gray-200">{{ p.categoria_nombre }}</span>
+                {% if p.limite and p.limite > 0 %}
+                  <span class="text-neutral-text dark:text-dark-neutral-text">{{ p.gasto_actual|floatformat:0 }} / {{ p.limite|floatformat:0 }}</span>
+                {% endif %}
+              </div>
+              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                {% if p.limite and p.limite > 0 %}
+                  {% if p.state == 'exceeded' %}
+                    <div class="bg-danger h-2.5 rounded-full" style="width:100%"></div>
+                  {% elif p.state == 'warning' %}
+                    <div class="bg-warning h-2.5 rounded-full" style="width:{{ p.pct }}%"></div>
+                  {% else %}
+                    <div class="bg-success h-2.5 rounded-full" style="width:{{ p.pct }}%"></div>
+                  {% endif %}
+                {% else %}
+                  <div class="bg-success h-2.5 rounded-full" style="width:0%"></div>
+                {% endif %}
+              </div>
+            </div>
+          {% empty %}
+            <div class="text-sm text-text-secondary">No hay presupuestos.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (function(){
+      // Pie/donut for gastos por categoria
+      const pieEl = document.getElementById('reports-pie-donut');
+      if(pieEl){
+        const pieCtx = pieEl.getContext('2d');
+        const pieLabels = {{ cat_labels_json|safe }} || [];
+        const pieData = {{ cat_values_json|safe }} || [];
+        const pieSum = pieData.reduce((a,b)=>a+ (Number(b)||0), 0);
+        if(pieSum > 0 && pieLabels.length){
+          if(window._reportsPie) window._reportsPie.destroy();
+          window._reportsPie = new Chart(pieCtx, {
+            type: 'doughnut',
+            data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: ['#60A5FA','#34D399','#FB7185','#F59E0B','#A78BFA','#F97316','#38BDF8'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
+          });
+        } else {
+          // show friendly placeholder when there's no data
+          const container = pieEl.parentElement;
+          if(container){
+            container.innerHTML = '<div class="flex items-center justify-center h-72"><span class="text-sm text-text-secondary">No hay datos para este mes.</span></div>';
+          }
+        }
+      }
+
+      // Doughnut for ingresos por categoria
+      const incomeEl = document.getElementById('reports-income-pie');
+      if(incomeEl){
+        const incomeCtx = incomeEl.getContext('2d');
+        const incomeLabels = {{ ingresos_cat_labels_json|safe }} || [];
+        const incomeData = {{ ingresos_cat_values_json|safe }} || [];
+        const incomeSum = incomeData.reduce((a,b)=>a+ (Number(b)||0), 0);
+        if(incomeSum > 0 && incomeLabels.length){
+          if(window._reportsIncome) window._reportsIncome.destroy();
+          window._reportsIncome = new Chart(incomeCtx, {
+            type: 'doughnut',
+            data: { labels: incomeLabels, datasets: [{ data: incomeData, backgroundColor: ['#60A5FA','#34D399','#FB7185','#F59E0B','#A78BFA','#F97316','#38BDF8'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
+          });
+        } else {
+          const container = incomeEl.parentElement;
+          if(container){
+            container.innerHTML = '<div class="flex items-center justify-center h-72"><span class="text-sm text-text-secondary">No hay datos para este mes.</span></div>';
+          }
+        }
+      }
+    })();
+  </script>
+
+{% endblock %}
