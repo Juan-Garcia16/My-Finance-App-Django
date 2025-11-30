@@ -12,7 +12,7 @@
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     {% for p in budgets %}
-      <div class="border rounded p-4">
+      <div class="flex flex-col rounded-xl shadow-sm bg-white dark:bg-gray-900/50 p-6 border border-gray-200 dark:border-gray-800 min-w-0 pb-2" data-pk="{{ p.pk }}" data-categoria-id="{{ p.categoria.id }}" data-categoria-name="{{ p.categoria.nombre }}" data-mes="{{ p.mes }}" data-limite="{{ p.limite }}">
         <div class="flex items-center justify-between">
           <div>
             <h3 class="font-semibold">{{ p.categoria.nombre }}</h3>
@@ -38,9 +38,9 @@
             {% endif %}
           </div>
                 <div class="mt-3 flex gap-2">
-                  <a href="{% url 'budgets:edit' p.pk %}" class="text-gray-500 hover:text-blue-500 dark:text-gray-400"">
+                  <a href="#" class="open-budget-edit text-gray-500 hover:text-blue-500 dark:text-gray-400" data-pk="{{ p.pk }}" data-categoria-id="{{ p.categoria.id }}" data-categoria-name="{{ p.categoria.nombre }}" data-mes="{{ p.mes }}" data-limite="{{ p.limite }}" title="Editar">
                     <span class="material-symbols-outlined text-xl">edit</span></a>
-                  <form method="post" action="{% url 'budgets:delete' p.pk %}">
+                  <form method="post" action="{% url 'budgets:delete' p.pk %}" onsubmit="return confirm('¿Eliminar presupuesto de {{ p.categoria.nombre }} ({{ p.mes }})?');">
                     {% csrf_token %}
                     <button class="text-[#34495e] dark:text-gray-300 hover:text-red-500">
                       <span class="material-symbols-outlined text-xl">delete</span></button>
@@ -53,64 +53,128 @@
     {% endfor %}
   </div>
 
-  <!-- Modal -->
-  <div id="modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center">
-    <div class="bg-white rounded shadow-lg w-11/12 md:w-1/2 p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold">{% if edit_pk %}Editar presupuesto{% else %}Crear presupuesto{% endif %}</h2>
-        <button id="close-modal" class="text-gray-600">✕</button>
+  <!-- Modal  -->
+  <div id="budget-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div id="budget-modal-overlay" class="absolute inset-0 bg-black/50"></div>
+    <div class="relative w-full max-w-lg mx-auto p-4">
+      <div id="budget-modal-content">
+        <div class="bg-white dark:bg-gray-900/50 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
+          <div class="mb-3 flex items-center justify-between">
+            <h3 id="budget-modal-title" class="text-lg font-bold">{% if edit_pk %}Editar presupuesto{% else %}Crear presupuesto{% endif %}</h3>
+            <button id="budget-modal-close" class="text-gray-600">✕</button>
+          </div>
+          <form method="post" id="budget-modal-form" action="{% if edit_pk %}{% url 'budgets:edit' edit_pk %}{% else %}{% url 'budgets:list' %}{% endif %}">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 gap-2">
+              <div>
+                <label class="block text-sm font-medium mb-1">Categoría</label>
+                {{ form.categoria }}
+                {% for err in form.categoria.errors %}<p class="text-red-500 text-xs">{{ err }}</p>{% endfor %}
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Mes</label>
+                {{ form.mes }}
+                {% for err in form.mes.errors %}<p class="text-red-500 text-xs">{{ err }}</p>{% endfor %}
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Límite</label>
+                {{ form.limite }}
+                {% for err in form.limite.errors %}<p class="text-red-500 text-xs">{{ err }}</p>{% endfor %}
+              </div>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <button type="submit" class="px-3 py-1 bg-primary text-white rounded-md">Guardar</button>
+              <button type="button" id="budget-modal-cancel" class="px-3 py-1 border rounded-md">Cancelar</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <form method="post" novalidate action="{% if edit_pk %}{% url 'budgets:edit' edit_pk %}{% else %}{% url 'budgets:list' %}{% endif %}">
-        {% csrf_token %}
-        <div class="space-y-3">
-          <div>
-            {{ form.categoria.label_tag }}
-            {{ form.categoria }}
-            {% for err in form.categoria.errors %}<div class="text-red-600 text-sm">{{ err }}</div>{% endfor %}
-          </div>
-          <div>
-            {{ form.mes.label_tag }}
-            {{ form.mes }}
-            {% for err in form.mes.errors %}<div class="text-red-600 text-sm">{{ err }}</div>{% endfor %}
-          </div>
-          <div>
-            {{ form.limite.label_tag }}
-            {{ form.limite }}
-            {% for err in form.limite.errors %}<div class="text-red-600 text-sm">{{ err }}</div>{% endfor %}
-          </div>
-        </div>
-        <div class="mt-4 flex justify-end">
-          <button type="button" id="cancel" class="mr-2">Cancelar</button>
-          <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded">Guardar</button>
-        </div>
-      </form>
     </div>
+    <style>
+      /* Compact modal styles: make inputs full width and tighter */
+      #budget-modal-form input, #budget-modal-form select, #budget-modal-form textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+      }
+      #budget-modal-form .form-row { margin-bottom: 0.25rem; }
+    </style>
   </div>
 
   </div>
 </div>
 
 <script>
-  const openBtn = document.getElementById('open-create');
-  const modal = document.getElementById('modal');
-  const closeBtn = document.getElementById('close-modal');
-  const cancelBtn = document.getElementById('cancel');
+  (function(){
+    const openCreate = document.getElementById('open-create');
+    const modal = document.getElementById('budget-modal');
+    const overlay = document.getElementById('budget-modal-overlay');
+    const content = document.getElementById('budget-modal-content');
+    const closeBtn = document.getElementById('budget-modal-close');
+    const cancelBtn = document.getElementById('budget-modal-cancel');
+    const form = document.getElementById('budget-modal-form');
+    const titleEl = document.getElementById('budget-modal-title');
 
-  function openModal(){ modal.classList.remove('hidden'); modal.classList.add('flex'); }
-  function closeModal(){ modal.classList.remove('flex'); modal.classList.add('hidden'); }
+    function openModal(){ modal.classList.remove('hidden'); }
+    function closeModal(){ modal.classList.add('hidden'); }
 
-  openBtn && openBtn.addEventListener('click', openModal);
-  closeBtn && closeBtn.addEventListener('click', closeModal);
-  cancelBtn && cancelBtn.addEventListener('click', closeModal);
+    // open create: reset form and set action to create/list URL
+    if(openCreate){
+      openCreate.addEventListener('click', function(e){
+        e.preventDefault();
+        if(form){
+          form.action = '{% url "budgets:list" %}';
+          const sel = form.querySelector('[name="categoria"]');
+          if(sel) sel.selectedIndex = 0;
+          const mes = form.querySelector('[name="mes"]'); if(mes) mes.value = '';
+          const limite = form.querySelector('[name="limite"]'); if(limite) limite.value = '';
+        }
+        if(titleEl) titleEl.textContent = 'Crear presupuesto';
+        openModal();
+      });
+    }
 
-  // si el view indicó errores, abrir modal
-  {% if open_modal %}
-    openModal();
-  {% endif %}
-  // si se abrió en modo edición, cambiar foco al modal
-  {% if edit_pk %}
-    openModal();
-  {% endif %}
+    // close handlers
+    if(overlay) overlay.addEventListener('click', closeModal);
+    if(closeBtn) closeBtn.addEventListener('click', closeModal);
+    if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // edit in-page: populate modal from data-attrs on card
+    document.querySelectorAll('.open-budget-edit').forEach(function(el){
+      el.addEventListener('click', function(evt){
+        evt.preventDefault();
+        const pk = el.getAttribute('data-pk');
+        const categoriaId = el.getAttribute('data-categoria-id');
+        const categoriaName = el.getAttribute('data-categoria-name');
+        const mes = el.getAttribute('data-mes');
+        const limite = el.getAttribute('data-limite');
+        if(!form) return;
+        // compute edit url based on named url with placeholder 0
+        const baseEdit = '{% url "budgets:edit" 0 %}';
+        const editUrl = baseEdit.replace('/0/', '/' + pk + '/');
+        form.action = editUrl;
+        const sel = form.querySelector('[name="categoria"]');
+        if(sel) sel.value = categoriaId;
+        const mesInput = form.querySelector('[name="mes"]'); if(mesInput) mesInput.value = mes;
+        const limiteInput = form.querySelector('[name="limite"]'); if(limiteInput) limiteInput.value = limite;
+        if(titleEl) titleEl.textContent = 'Editar presupuesto — ' + (categoriaName || '');
+        openModal();
+      });
+    });
+
+    // open modal if server asked to (form errors)
+    {% if open_modal %}
+      openModal();
+    {% endif %}
+
+    // if edit_pk provided by server, ensure modal opens (form is prefilled server-side)
+    {% if edit_pk %}
+      openModal();
+    {% endif %}
+
+    // ESC to close
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+  })();
 </script>
 
 {% endblock %}

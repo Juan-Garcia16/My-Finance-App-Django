@@ -72,7 +72,8 @@ def delete_budget(request, pk):
 		presupuesto.delete()
 		messages.success(request, 'Presupuesto eliminado.', extra_tags='budgets')
 		return redirect(reverse('budgets:list'))
-	return render(request, 'budgets/confirm_delete.html', {'presupuesto': presupuesto})
+	# Usamos confirm() del navegador; redirigimos si se accede por GET
+	return redirect(reverse('budgets:list'))
 
 
 def edit_budget(request, pk):
