@@ -10,6 +10,8 @@ from .models import Profile
 from decimal import Decimal
 from django.db.models import Sum
 from django.utils import timezone
+import calendar
+import json
 from transactions.models import Ingreso, Gasto
 from decimal import ROUND_HALF_UP
 
@@ -100,6 +102,38 @@ def dashboard_view(request):
 		'ingresos_mes_display': format_cop(ingresos_total),
 		'gastos_mes_display': format_cop(gastos_total),
 	}
+
+	# build daily series for current month (labels: days)
+	# days count
+	days_in_month = calendar.monthrange(year, month)[1]
+	labels = [f"{d:02d}" for d in range(1, days_in_month + 1)]
+
+	# initialize zeros
+	ingresos_by_day = [0.0] * days_in_month
+	gastos_by_day = [0.0] * days_in_month
+
+	# aggregate ingresos by day
+	ingresos_days_qs = Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month)
+	for inc in ingresos_days_qs:
+		try:
+			day = inc.fecha.day
+			ingresos_by_day[day-1] += float(inc.monto or 0)
+		except Exception:
+			continue
+
+	# aggregate gastos by day
+	gastos_days_qs = Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month)
+	for g in gastos_days_qs:
+		try:
+			day = g.fecha.day
+			gastos_by_day[day-1] += float(g.monto or 0)
+		except Exception:
+			continue
+
+	# prepare JSON for template
+	context['chart_labels_json'] = json.dumps(labels)
+	context['ingresos_data_json'] = json.dumps(ingresos_by_day)
+	context['gastos_data_json'] = json.dumps(gastos_by_day)
 	# Obtener últimas transacciones (ingresos + gastos) y ordenar por fecha descendente
 	# incluimos el color de la categoría para mostrarlo en el dashboard
 	ingresos_qs = Ingreso.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'categoria__color', 'monto', 'fecha', 'descripcion')
