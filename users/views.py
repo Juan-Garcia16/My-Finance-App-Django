@@ -62,6 +62,36 @@ def dashboard_view(request):
 		'ingresos_mes': ingresos_total,
 		'gastos_mes': gastos_total,
 	}
+	# Obtener últimas transacciones (ingresos + gastos) y ordenar por fecha descendente
+	ingresos_qs = Ingreso.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'monto', 'fecha', 'descripcion')
+	gastos_qs = Gasto.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'monto', 'fecha', 'descripcion')
+
+	recent = []
+	for i in ingresos_qs:
+		recent.append({
+			'id': i['id'],
+			'tipo': 'ingreso',
+			'categoria': i.get('categoria__nombre') or '',
+			'monto': i.get('monto') or Decimal('0.00'),
+			'fecha': i.get('fecha'),
+			'descripcion': i.get('descripcion') or '',
+		})
+	for g in gastos_qs:
+		recent.append({
+			'id': g['id'],
+			'tipo': 'gasto',
+			'categoria': g.get('categoria__nombre') or '',
+			'monto': g.get('monto') or Decimal('0.00'),
+			'fecha': g.get('fecha'),
+			'descripcion': g.get('descripcion') or '',
+		})
+
+	# ordenar por fecha (y luego id) descendente
+	recent_sorted = sorted(recent, key=lambda r: (r['fecha'], r['id']), reverse=True)
+	recent_top5 = recent_sorted[:5]
+
+	context['recent_transactions'] = recent_top5
+
 	return render(request, 'dashboard.html', context)
 
 @login_required

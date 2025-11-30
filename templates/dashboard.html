@@ -15,18 +15,10 @@
       </p>
     </div>
     <div class="flex gap-3">
-      <button
-        class="flex max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 bg-accent px-4 text-sm font-bold text-white"
-      >
+      <a href="{% url 'transactions:create' %}" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-colors">
         <span class="material-symbols-outlined">add</span>
-        <span>Agregar Ingreso</span>
-      </button>
-      <button
-        class="flex max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 bg-primary-dark-button px-4 text-sm font-bold text-white"
-      >
-        <span class="material-symbols-outlined">add</span>
-        <span>Agregar Gasto</span>
-      </button>
+        <span class="truncate">Agregar Transacción</span>
+      </a>
     </div>
   </div>
   <!-- Stats -->
@@ -94,84 +86,24 @@
       <div
         class="rounded-xl border border-gray-200 dark:border-gray-700 bg-surface dark:bg-surface-dark p-6"
       >
-        <h2
-          class="text-lg font-bold text-text-main dark:text-text-main-dark mb-4"
-        >
-          Últimas Transacciones
-        </h2>
+        <h2 class="text-lg font-bold text-text-main dark:text-text-main-dark mb-4">Últimas Transacciones</h2>
         <ul class="flex flex-col gap-4">
+          {% for tx in recent_transactions %}
           <li class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div
-                class="flex size-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400"
-              >
-                <span class="material-symbols-outlined">shopping_cart</span>
+              <div class="flex size-10 items-center justify-center rounded-full {% if tx.tipo == 'gasto' %}bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400{% else %}bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400{% endif %}">
+                <span class="material-symbols-outlined">{% if tx.tipo == 'gasto' %}shopping_cart{% else %}work{% endif %}</span>
               </div>
               <div>
-                <p class="font-medium">Supermercado</p>
-                <p
-                  class="text-sm text-text-secondary dark:text-text-secondary-dark"
-                >
-                  Compra de víveres
-                </p>
+                <p class="font-medium">{{ tx.categoria }}</p>
+                <p class="text-sm text-text-secondary dark:text-text-secondary-dark">{{ tx.descripcion }}</p>
               </div>
             </div>
-            <p class="font-semibold text-danger">-$75.50</p>
+            <p class="font-semibold {% if tx.tipo == 'gasto' %}text-danger{% else %}text-accent{% endif %}">{% if tx.tipo == 'gasto' %}-{% else %}+{% endif %} ${{ tx.monto|floatformat:2 }}</p>
           </li>
-          <li class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex size-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400"
-              >
-                <span class="material-symbols-outlined">work</span>
-              </div>
-              <div>
-                <p class="font-medium">Salario</p>
-                <p
-                  class="text-sm text-text-secondary dark:text-text-secondary-dark"
-                >
-                  Depósito mensual
-                </p>
-              </div>
-            </div>
-            <p class="font-semibold text-accent">+$2,500.00</p>
-          </li>
-          <li class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex size-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400"
-              >
-                <span class="material-symbols-outlined">receipt</span>
-              </div>
-              <div>
-                <p class="font-medium">Factura de Internet</p>
-                <p
-                  class="text-sm text-text-secondary dark:text-text-secondary-dark"
-                >
-                  Pago de servicio
-                </p>
-              </div>
-            </div>
-            <p class="font-semibold text-danger">-$50.00</p>
-          </li>
-          <li class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div
-                class="flex size-10 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 text-yellow-600 dark:text-yellow-400"
-              >
-                <span class="material-symbols-outlined">restaurant</span>
-              </div>
-              <div>
-                <p class="font-medium">Restaurante</p>
-                <p
-                  class="text-sm text-text-secondary dark:text-text-secondary-dark"
-                >
-                  Cena con amigos
-                </p>
-              </div>
-            </div>
-            <p class="font-semibold text-danger">-$120.00</p>
-          </li>
+          {% empty %}
+          <li class="text-sm text-text-secondary">No hay transacciones recientes.</li>
+          {% endfor %}
         </ul>
       </div>
     </div>
