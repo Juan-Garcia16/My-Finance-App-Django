@@ -4,11 +4,22 @@
 {% block content %}
 <div class="flex flex-1 justify-center py-5">
   <div class="flex flex-col w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8 min-w-0">
-    <div class="flex items-center justify-between mb-4">
-    <h2 class="text-[#34495e] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Presupuestos</h2>
-    <button id="open-create" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-colors"><span class="material-symbols-outlined">add</span>
-        <span class="truncate">Agregar Presupuesto</span></button>
-  </div>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8 pt-0">
+      <div class="flex min-w-72 flex-col gap-1">
+        <h1 class="text-[#34495e] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+          Presupuestos
+        </h1>
+        <p class="text-text-secondary dark:text-text-secondary-dark">
+          Administra tus límites de gasto mensuales por categoría.
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <button id="open-create" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-colors">
+          <span class="material-symbols-outlined">add</span>
+          <span class="truncate">Agregar Presupuesto</span>
+        </button>
+      </div>
+    </div>
 
   <div class="mb-4 flex items-center gap-3">
     <label class="text-sm">Fecha:</label>
