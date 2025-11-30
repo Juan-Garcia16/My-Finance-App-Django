@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-semibold">Presupuestos</h1>
+    <button id="open-create" class="bg-blue-600 text-white px-3 py-1 rounded">Nuevo presupuesto</button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for p in budgets %}
+      <div class="border rounded p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold">{{ p.categoria.nombre }}</h3>
+            <p class="text-sm text-gray-600">{{ p.mes }}</p>
+          </div>
+          <div class="text-right">
+            <p class="font-medium">Límite: ${{ p.limite }}</p>
+            <p class="text-sm">Gastado: ${{ p.gasto_actual }}</p>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <div class="w-full bg-gray-200 h-2 rounded overflow-hidden">
+            <div style="width: {{ p.porcentaje|floatformat:0 }}%" class="h-2 {% if p.estado == 'exceeded' %}bg-red-600{% elif p.estado == 'warning' %}bg-yellow-400{% else %}bg-green-500{% endif %}"></div>
+          </div>
+          <div class="mt-2 text-sm">
+            {% if p.estado == 'exceeded' %}
+              <span class="text-red-600 font-semibold">Límite superado ({{ p.porcentaje|floatformat:0 }}%)</span>
+            {% elif p.estado == 'warning' %}
+              <span class="text-yellow-600">Cerca del límite ({{ p.porcentaje|floatformat:0 }}%)</span>
+            {% else %}
+              <span class="text-green-600">Dentro del límite ({{ p.porcentaje|floatformat:0 }}%)</span>
+            {% endif %}
+          </div>
+                <div class="mt-3 flex gap-2">
+                  <a href="{% url 'budgets:edit' p.pk %}" class="text-sm text-blue-600">Editar</a>
+                  <form method="post" action="{% url 'budgets:delete' p.pk %}">
+                    {% csrf_token %}
+                    <button class="text-sm text-red-600">Eliminar</button>
+                  </form>
+                </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>No hay presupuestos aún.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center">
+    <div class="bg-white rounded shadow-lg w-11/12 md:w-1/2 p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">{% if edit_pk %}Editar presupuesto{% else %}Crear presupuesto{% endif %}</h2>
+        <button id="close-modal" class="text-gray-600">✕</button>
+      </div>
+      <form method="post" novalidate action="{% if edit_pk %}{% url 'budgets:edit' edit_pk %}{% else %}{% url 'budgets:list' %}{% endif %}">
+        {% csrf_token %}
+        <div class="space-y-3">
+          <div>
+            {{ form.categoria.label_tag }}
+            {{ form.categoria }}
+            {% for err in form.categoria.errors %}<div class="text-red-600 text-sm">{{ err }}</div>{% endfor %}
+          </div>
+          <div>
+            {{ form.mes.label_tag }}
+            {{ form.mes }}
+            {% for err in form.mes.errors %}<div class="text-red-600 text-sm">{{ err }}</div>{% endfor %}
+          </div>
+          <div>
+            {{ form.limite.label_tag }}
+            {{ form.limite }}
+            {% for err in form.limite.errors %}<div class="text-red-600 text-sm">{{ err }}</div>{% endfor %}
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button type="button" id="cancel" class="mr-2">Cancelar</button>
+          <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const openBtn = document.getElementById('open-create');
+  const modal = document.getElementById('modal');
+  const closeBtn = document.getElementById('close-modal');
+  const cancelBtn = document.getElementById('cancel');
+
+  function openModal(){ modal.classList.remove('hidden'); modal.classList.add('flex'); }
+  function closeModal(){ modal.classList.remove('flex'); modal.classList.add('hidden'); }
+
+  openBtn && openBtn.addEventListener('click', openModal);
+  closeBtn && closeBtn.addEventListener('click', closeModal);
+  cancelBtn && cancelBtn.addEventListener('click', closeModal);
+
+  // si el view indicó errores, abrir modal
+  {% if open_modal %}
+    openModal();
+  {% endif %}
+  // si se abrió en modo edición, cambiar foco al modal
+  {% if edit_pk %}
+    openModal();
+  {% endif %}
+</script>
+
+{% endblock %}

@@ -1,5 +1,4 @@
 from transactions.models import Ingreso, Gasto
-from budgets.models import Presupuesto
 from categories.models import Category
 
 class TransactionManager:
@@ -29,21 +28,12 @@ class TransactionManager:
         # polimorfismo: cada tipo implementa su lógica
         transaccion.registrar()
 
-        # actualización automática de presupuestos
-        self._actualizar_presupuestos(categoria_obj, monto, tipo)
+        # NOTA: la lógica de actualización de presupuestos se maneja en el módulo budgets
+        # mediante señales para evitar duplicados y problemas de mes/alcance.
 
         return transaccion
 
-    def _actualizar_presupuestos(self, categoria, monto, tipo):
-        # solo gastos afectan presupuesto
-        if tipo == "gasto":
-            try:
-                presupuesto = Presupuesto.objects.get(
-                    usuario=self.usuario, categoria=categoria
-                )
-                presupuesto.actualizar_gasto(monto)
-            except Presupuesto.DoesNotExist:
-                pass
+
 
     def listar_transacciones(self):
         # devuelve lista mezclada de ingresos y gastos, cada item tiene atributo 'tipo' para identificar
@@ -70,12 +60,6 @@ class TransactionManager:
             trans = Gasto.objects.get(id=transaccion_id, usuario=self.usuario)
             # revertir gasto en saldo
             self.usuario.actualizar_saldo(trans.monto)
-            # ajustar presupuesto si existe
-            try:
-                presupuesto = Presupuesto.objects.get(usuario=self.usuario, categoria=trans.categoria)
-                presupuesto.actualizar_gasto(-trans.monto)
-            except Presupuesto.DoesNotExist:
-                pass
             trans.delete()
         return True
 
@@ -91,11 +75,6 @@ class TransactionManager:
             antigua = Gasto.objects.get(id=transaccion_id, usuario=self.usuario)
             # revertir gasto
             self.usuario.actualizar_saldo(antigua.monto)
-            try:
-                presupuesto = Presupuesto.objects.get(usuario=self.usuario, categoria=antigua.categoria)
-                presupuesto.actualizar_gasto(-antigua.monto)
-            except Presupuesto.DoesNotExist:
-                pass
             antigua.delete()
 
         # Crear nueva transacción usando el método existente
