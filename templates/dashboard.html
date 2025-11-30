@@ -91,15 +91,16 @@
           {% for tx in recent_transactions %}
           <li class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-full {% if tx.tipo == 'gasto' %}bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400{% else %}bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400{% endif %}">
-                <span class="material-symbols-outlined">{% if tx.tipo == 'gasto' %}shopping_cart{% else %}work{% endif %}</span>
+              {# Mostrar un círculo con el color asociado a la categoría en lugar de un icono genérico #}
+              <div class="flex items-center justify-center rounded-full" style="width:36px;height:36px;flex:0 0 36px;border-radius:9999px;background: {{ tx.categoria_color|default:'#e5e7eb' }};box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);">
+                {# opcional: mostrar inicial de la categoría con contraste si se desea; por ahora dejamos vacío para mostrar solo color #}
               </div>
               <div>
                 <p class="font-medium">{{ tx.categoria }}</p>
                 <p class="text-sm text-text-secondary dark:text-text-secondary-dark">{{ tx.descripcion }}</p>
               </div>
             </div>
-            <p class="font-semibold {% if tx.tipo == 'gasto' %}text-danger{% else %}text-accent{% endif %}">{% if tx.tipo == 'gasto' %}-{% else %}+{% endif %} ${{ tx.monto|floatformat:2 }}</p>
+            <p class="font-semibold {% if tx.tipo == 'gasto' %}text-danger{% else %}text-accent{% endif %}">{% if tx.tipo == 'gasto' %}-{% else %}+{% endif %} ${{ tx.monto_display }}</p>
           </li>
           {% empty %}
           <li class="text-sm text-text-secondary">No hay transacciones recientes.</li>

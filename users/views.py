@@ -101,8 +101,9 @@ def dashboard_view(request):
 		'gastos_mes_display': format_cop(gastos_total),
 	}
 	# Obtener últimas transacciones (ingresos + gastos) y ordenar por fecha descendente
-	ingresos_qs = Ingreso.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'monto', 'fecha', 'descripcion')
-	gastos_qs = Gasto.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'monto', 'fecha', 'descripcion')
+	# incluimos el color de la categoría para mostrarlo en el dashboard
+	ingresos_qs = Ingreso.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'categoria__color', 'monto', 'fecha', 'descripcion')
+	gastos_qs = Gasto.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'categoria__color', 'monto', 'fecha', 'descripcion')
 
 	recent = []
 	for i in ingresos_qs:
@@ -110,7 +111,9 @@ def dashboard_view(request):
 			'id': i['id'],
 			'tipo': 'ingreso',
 			'categoria': i.get('categoria__nombre') or '',
+			'categoria_color': i.get('categoria__color') or '#e5e7eb',
 			'monto': i.get('monto') or Decimal('0.00'),
+			'monto_display': format_cop(i.get('monto') or Decimal('0.00')),
 			'fecha': i.get('fecha'),
 			'descripcion': i.get('descripcion') or '',
 		})
@@ -119,7 +122,9 @@ def dashboard_view(request):
 			'id': g['id'],
 			'tipo': 'gasto',
 			'categoria': g.get('categoria__nombre') or '',
+			'categoria_color': g.get('categoria__color') or '#e5e7eb',
 			'monto': g.get('monto') or Decimal('0.00'),
+			'monto_display': format_cop(g.get('monto') or Decimal('0.00')),
 			'fecha': g.get('fecha'),
 			'descripcion': g.get('descripcion') or '',
 		})
