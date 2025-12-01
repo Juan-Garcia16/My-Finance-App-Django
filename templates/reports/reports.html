@@ -8,11 +8,12 @@
           <h2 class="text-[#34495e] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Reportes</h2>
           <p class="text-neutral-text dark:text-dark-neutral-text text-base font-normal leading-normal">Visualiza tus datos financieros para tomar mejores decisiones.</p>
         </div>
-        <div class="flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-700 p-1">
-          <button class="px-3 py-1.5 rounded-md text-sm font-medium text-primary dark:text-white bg-gray-100 dark:bg-gray-800">Mensual</button>
-          <button class="px-3 py-1.5 rounded-md text-sm font-medium text-neutral-text dark:text-dark-neutral-text hover:bg-gray-100 dark:hover:bg-gray-800">Trimestral</button>
-          <button class="px-3 py-1.5 rounded-md text-sm font-medium text-neutral-text dark:text-dark-neutral-text hover:bg-gray-100 dark:hover:bg-gray-800">Anual</button>
-        </div>
+        <form id="reports-month-form" method="get" class="flex items-center gap-2">
+          <button type="button" id="prev-month" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800" title="Mes anterior">◀</button>
+          <input id="month-input" name="mes" type="month" class="border rounded px-2 py-1" value="{{ mes_key }}">
+          <button type="button" id="next-month" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800" title="Mes siguiente">▶</button>
+          <button type="submit"></button>
+        </form>
       </div>
     </header>
 
@@ -72,15 +73,33 @@
               <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                 {% if p.limite and p.limite > 0 %}
                   {% if p.state == 'exceeded' %}
-                    <div class="bg-danger h-2.5 rounded-full" style="width:100%"></div>
+                    <div class="bg-red-600 h-2.5 rounded-full" style="width:100%"></div>
                   {% elif p.state == 'warning' %}
-                    <div class="bg-warning h-2.5 rounded-full" style="width:{{ p.pct }}%"></div>
+                    <div class="bg-yellow-400 h-2.5 rounded-full" style="width:{{ p.pct_display }}%"></div>
                   {% else %}
-                    <div class="bg-success h-2.5 rounded-full" style="width:{{ p.pct }}%"></div>
+                    <div class="bg-green-500 h-2.5 rounded-full" style="width:{{ p.pct_display }}%"></div>
                   {% endif %}
                 {% else %}
-                  <div class="bg-success h-2.5 rounded-full" style="width:0%"></div>
+                  <div class="bg-green-500 h-2.5 rounded-full" style="width:0%"></div>
                 {% endif %}
+              </div>
+              <div class="mt-2 text-sm flex items-center justify-between">
+                <div>
+                  {% if p.limite and p.limite > 0 %}
+                    {% if p.state == 'exceeded' %}
+                      <span class="text-red-600 font-semibold">Límite superado ({{ p.pct|floatformat:0 }}%)</span>
+                    {% elif p.state == 'warning' %}
+                      <span class="text-yellow-600">Cerca del límite ({{ p.pct|floatformat:0 }}%)</span>
+                    {% else %}
+                      <span class="text-green-600">Dentro del límite ({{ p.pct|floatformat:0 }}%)</span>
+                    {% endif %}
+                  {% else %}
+                    <span class="text-neutral-text">Sin límite definido</span>
+                  {% endif %}
+                </div>
+                <div class="text-sm text-neutral-text">
+                  {% if p.limite and p.limite > 0 %}{{ p.pct_display }}%{% endif %}
+                </div>
               </div>
             </div>
           {% empty %}
@@ -137,6 +156,33 @@
           }
         }
       }
+    })();
+    // month prev/next handlers
+    (function(){
+      const form = document.getElementById('reports-month-form');
+      const input = document.getElementById('month-input');
+      const prev = document.getElementById('prev-month');
+      const next = document.getElementById('next-month');
+      function shiftMonth(delta){
+        if(!input) return;
+        const v = input.value || '';
+        // v format YYYY-MM
+        let d;
+        if(v){
+          const parts = v.split('-');
+          d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+        } else {
+          d = new Date();
+          d.setDate(1);
+        }
+        d.setMonth(d.getMonth() + delta);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2,'0');
+        input.value = `${y}-${m}`;
+        if(form) form.submit();
+      }
+      if(prev) prev.addEventListener('click', ()=>shiftMonth(-1));
+      if(next) next.addEventListener('click', ()=>shiftMonth(1));
     })();
   </script>
 

@@ -5,6 +5,8 @@ from .services.report_manager import ReportManager
 import json
 from django.db.models import Sum
 from transactions.models import Ingreso, Gasto
+from datetime import datetime
+from calendar import monthrange
 
 
 @login_required
@@ -12,10 +14,21 @@ def reports_index(request):
 	profile = request.user.profile
 	rm = ReportManager(profile)
 
-	# Overall ingresos vs gastos for current month
-	now = timezone.now()
-	year = now.year
-	month = now.month
+	# determine selected month (GET param 'mes' as YYYY-MM) or use current
+	mes_get = request.GET.get('mes')
+	if mes_get:
+		try:
+			_sel = datetime.strptime(mes_get, '%Y-%m')
+			year = _sel.year
+			month = _sel.month
+		except Exception:
+			now = timezone.now()
+			year = now.year
+			month = now.month
+	else:
+		now = timezone.now()
+		year = now.year
+		month = now.month
 
 	ingresos_agg = Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
 	gastos_agg = Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
@@ -45,8 +58,7 @@ def reports_index(request):
 	ing_values = [float(c['total'] or 0) for c in ingresos_cat_qs]
 
 	# presupuestos y metas (build lightweight dicts for template)
-	now = timezone.now()
-	mes_key = f"{now.year}-{now.month:02d}"
+	mes_key = f"{year}-{month:02d}"
 	presupuestos_qs = rm.estado_presupuestos().filter(mes=mes_key)
 	presupuestos = []
 	for p in presupuestos_qs:
@@ -54,11 +66,16 @@ def reports_index(request):
 		gasto = float(p.gasto_actual or 0)
 		pct = 0
 		state = 'ok'
+		pct_display = 0
 		if lim > 0:
+			# percentage of budget used
 			pct = int(round((gasto / lim) * 100))
-			if gasto >= lim:
+			# cap display percentage to 100 for progress bar width
+			pct_display = max(0, min(pct, 100))
+			# determine state based on pct
+			if pct >= 100:
 				state = 'exceeded'
-			elif gasto >= lim * 0.8:
+			elif pct >= 80:
 				state = 'warning'
 		presupuestos.append({
 			'categoria_nombre': p.categoria.nombre,
@@ -66,6 +83,7 @@ def reports_index(request):
 			'limite': lim,
 			'gasto_actual': gasto,
 			'pct': pct,
+			'pct_display': pct_display,
 			'state': state,
 		})
 
@@ -73,6 +91,9 @@ def reports_index(request):
 	metas = list(metas_qs)
 
 	context = {
+				'mes_key': mes_key,
+				'selected_year': year,
+				'selected_month': month,
 		'cat_labels_json': json.dumps(cat_labels),
 		'cat_values_json': json.dumps(cat_values),
 		'ingresos_total': ingresos_total,
