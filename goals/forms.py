@@ -6,7 +6,7 @@ class GoalForm(forms.ModelForm):
     fecha_limite = forms.DateField(
         widget=forms.DateInput(attrs={"type": "date", "class": "w-full rounded-md border p-2"})
     )
-
+    
     class Meta:
         model = MetaAhorro
         fields = ["nombre", "monto_objetivo", "fecha_limite"]
@@ -17,5 +17,6 @@ class GoalForm(forms.ModelForm):
 
 
 class ContributionForm(forms.Form):
+    '''Formulario para anadir contribuciones a una meta de ahorro'''
     monto = forms.DecimalField(max_digits=12, decimal_places=2, min_value=0.01,
                                widget=forms.NumberInput(attrs={"class": "w-24 rounded-md border p-2", "step": "0.01"}))

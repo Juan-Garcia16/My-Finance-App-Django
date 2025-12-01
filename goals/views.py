@@ -14,7 +14,7 @@ from decimal import ROUND_HALF_UP
 
 
 def _format_cop(value):
-    """Format a numeric/Decimal value as Colombian pesos display (no cents)."""
+    """Formato numerico para pesos colombianos COP (sin decimales)"""
     if value is None:
         return ''
     try:
@@ -41,12 +41,13 @@ def _format_cop(value):
 
 @login_required
 def list_goals(request):
+    '''Lista todas las metas de ahorro del usuario'''
     profile = Profile.objects.get(user=request.user)
     goals = MetaAhorro.objects.filter(usuario=profile).order_by('fecha_limite')
     contribution_form = ContributionForm()
-    from .forms import GoalForm
     goal_form = GoalForm()
-    # attach formatted display strings to each goal
+
+    # formateo a COP para cada monto de la meta
     for g in goals:
         try:
             g.progreso_display = _format_cop(g.progreso)
@@ -65,6 +66,8 @@ def list_goals(request):
 
 @login_required
 def create_goal(request):
+    '''Crea una nueva meta de ahorro'''
+    
     profile = Profile.objects.get(user=request.user)
     manager = GoalManager(profile)
     if request.method == 'POST':
@@ -81,6 +84,8 @@ def create_goal(request):
 
 @login_required
 def edit_goal(request, pk):
+    '''Edita una meta de ahorro existente'''
+    
     profile = Profile.objects.get(user=request.user)
     goal = get_object_or_404(MetaAhorro, pk=pk, usuario=profile)
     if request.method == 'POST':
@@ -91,6 +96,7 @@ def edit_goal(request, pk):
             return redirect('goals:list')
     else:
         form = GoalForm(instance=goal)
+        
     # Si se solicita partial=1 devolvemos JSON con los datos de la meta (para rellenar el form inline)
     if request.GET.get('partial') == '1':
         data = {
@@ -98,6 +104,7 @@ def edit_goal(request, pk):
             'nombre': goal.nombre,
             'monto_objetivo': str(goal.monto_objetivo),
             'fecha_limite': goal.fecha_limite.isoformat() if goal.fecha_limite else '',
+            # action URL para el formulario
             'action': f"{request.scheme}://{request.get_host()}/goals/{goal.id}/edit/",
         }
         return JsonResponse(data)
@@ -107,9 +114,11 @@ def edit_goal(request, pk):
 
 @login_required
 def delete_goal(request, pk):
+    '''Elimina una meta de ahorro'''
+    
     profile = Profile.objects.get(user=request.user)
     goal = get_object_or_404(MetaAhorro, pk=pk, usuario=profile)
-    # Usar confirm del navegador; no renderizamos plantilla GET.
+
     if request.method == 'POST':
         goal.delete()
         messages.success(request, 'Meta eliminada.', extra_tags='goals')
@@ -120,6 +129,8 @@ def delete_goal(request, pk):
 
 @login_required
 def add_contribution(request, pk):
+    '''Anade una contribución a una meta de ahorro'''
+    
     profile = Profile.objects.get(user=request.user)
     goal = get_object_or_404(MetaAhorro, pk=pk, usuario=profile)
     if request.method == 'POST':
@@ -131,54 +142,8 @@ def add_contribution(request, pk):
                 messages.info(request, 'La meta ya está cumplida.', extra_tags='goals')
             else:
                 manager = GoalManager(profile)
-                manager.añadir_progreso(goal.id, monto)
+                manager.anadir_progreso(goal.id, monto)
                 messages.success(request, 'Aporte agregado a la meta.', extra_tags='goals')
         else:
             messages.error(request, 'El monto no es válido.', extra_tags='goals')
     return redirect('goals:list')
-
-
-@login_required
-def recalculate_progress_from_transactions(request):
-    """
-    Recalcula el progreso de todas las metas del usuario basándose en las transacciones.
-    Convención: si la descripción de un `Ingreso` contiene `meta:<id>` (por ejemplo `meta:3`),
-    ese ingreso se suma al progreso de la meta con id=3.
-    Esta vista es idempotente y puede usarse como utilidad administrativa por el usuario.
-    """
-    profile = Profile.objects.get(user=request.user)
-    goals = MetaAhorro.objects.filter(usuario=profile)
-
-    # Inicializamos conteo
-    from decimal import Decimal
-    sums = {g.id: Decimal('0') for g in goals}
-
-    ingresos = Ingreso.objects.filter(usuario=profile)
-    pattern = re.compile(r"meta:(\d+)")
-    for ing in ingresos:
-        if not ing.descripcion:
-            continue
-        matches = pattern.findall(ing.descripcion)
-        for mid in matches:
-            try:
-                mid_i = int(mid)
-            except ValueError:
-                continue
-            if mid_i in sums:
-                try:
-                    sums[mid_i] += Decimal(ing.monto)
-                except Exception:
-                    sums[mid_i] += Decimal(str(ing.monto))
-
-    # Guardar valores calculados (capping en monto_objetivo)
-    for g in goals:
-        calc = sums.get(g.id, Decimal('0'))
-        if g.monto_objetivo and calc >= g.monto_objetivo:
-            g.progreso = g.monto_objetivo
-        else:
-            g.progreso = calc
-        g.save()
-
-    messages.success(request, 'Progreso recalculado desde transacciones.', extra_tags='goals')
-    return redirect('goals:list')
-    

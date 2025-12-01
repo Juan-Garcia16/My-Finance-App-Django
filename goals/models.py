@@ -12,6 +12,8 @@ class MetaAhorro(models.Model):
     progreso = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def actualizar_progreso(self, monto):
+        '''Actualizar el progreso de la meta al agregar una contribución'''
+        
         # Asegurarse que usamos Decimal para sumar y no superar el objetivo
         try:
             monto_dec = Decimal(monto)
@@ -26,6 +28,8 @@ class MetaAhorro(models.Model):
         self.save()
 
     def porcentaje_progreso(self):
+        '''Calcular el porcentaje de progreso hacia la meta para visualizar en barra'''
+        
         # Evitar división por cero y usar Decimal para precisión
         if not self.monto_objetivo or self.monto_objetivo == 0:
             return 0

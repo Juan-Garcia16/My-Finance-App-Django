@@ -5,6 +5,7 @@ class GoalManager:
         self.usuario = usuario_profile
 
     def crear_meta(self, nombre, monto_objetivo, fecha_limite):
+        '''Crea una nueva meta de ahorro para el usuario'''
         return MetaAhorro.objects.create(
             usuario=self.usuario,
             nombre=nombre,
@@ -12,7 +13,8 @@ class GoalManager:
             fecha_limite=fecha_limite
         )
 
-    def añadir_progreso(self, meta_id, monto):
+    def anadir_progreso(self, meta_id, monto):
+        '''Anade una contribucion al progreso de la meta especificada'''
         meta = MetaAhorro.objects.get(id=meta_id, usuario=self.usuario)
         meta.actualizar_progreso(monto)
         return meta

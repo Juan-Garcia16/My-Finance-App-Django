@@ -9,5 +9,5 @@ urlpatterns = [
 	path('<int:pk>/edit/', views.edit_goal, name='edit'),
 	path('<int:pk>/delete/', views.delete_goal, name='delete'),
 	path('<int:pk>/contribute/', views.add_contribution, name='contribute'),
-	path('recalculate/', views.recalculate_progress_from_transactions, name='recalculate'),
+
 ]
