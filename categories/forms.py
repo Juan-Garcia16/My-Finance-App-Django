@@ -3,6 +3,7 @@ from .models import Category
 
 
 class CategoryForm(forms.ModelForm):
+    '''Formulario para crear/editar categorías en la aplicación por medio de una modal'''
     class Meta:
         model = Category
         fields = ['nombre', 'tipo', 'color']

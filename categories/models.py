@@ -12,7 +12,7 @@ class Category(models.Model):
     usuario = models.ForeignKey(Profile, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=50)
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
-    color = models.CharField(max_length=20, default="#22C55E")  # opcional, útil en UI
+    color = models.CharField(max_length=20, default="#22C55E")
 
     def __str__(self):
         return f"{self.nombre} ({self.tipo})"

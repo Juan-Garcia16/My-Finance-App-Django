@@ -1,12 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
 from .models import Category
 from .forms import CategoryForm
 from users.models import Profile
 from .services.category_manager import CategoryManager
-
 
 @login_required
 def categories_list(request):
@@ -21,11 +19,13 @@ def categories_list(request):
 					form.cleaned_data['tipo'],
 					form.cleaned_data.get('color') or None,
 				)
+				#extra_tags para mensajes específicos de categorías en los templates
 				messages.success(request, 'Categoría creada correctamente.', extra_tags='categories')
-				return redirect('categories:list')
+				return redirect('categories:list') #volver a todas las categorias
 			except ValueError as e:
 				messages.error(request, str(e), extra_tags='categories')
 	else:
+		# Formulario en blanco para nueva categoría
 		form = CategoryForm()
 
 	categories = manager.obtener_categorias().order_by('nombre')
@@ -36,6 +36,7 @@ def categories_list(request):
 def category_edit(request, pk):
 	profile = Profile.objects.get(user=request.user)
 	manager = CategoryManager(profile)
+	# obtener id específico de la categoria a editar
 	category = get_object_or_404(Category, pk=pk, usuario=profile)
 	if request.method == 'POST':
 		form = CategoryForm(request.POST, instance=category)
