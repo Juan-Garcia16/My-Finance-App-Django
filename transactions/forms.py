@@ -9,7 +9,7 @@ TIPO_CHOICES = [
 
 
 class TransactionForm(forms.Form):
-    shared_input_classes = 'block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark text-text-main dark:text-text-main-dark px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50'
+    shared_input_classes = 'block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark text-text-main dark:text-text-main-dark px-3 py-2'
 
     tipo = forms.ChoiceField(
         choices=TIPO_CHOICES,

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex-1 p-8 pb-16 bg-background-light dark:bg-background-dark mb-8">
+<div class="flex-1 p-8 bg-background-light dark:bg-background-dark mb-0 pb-0">
   <div class="max-w-4xl mx-auto px-8 pb-16">
     <!-- PageHeading -->
     <div class="flex flex-wrap justify-between gap-3 pb-8">
@@ -71,27 +71,6 @@
           </label>
         </div>
         <div class="border-t border-[#dce5df] dark:border-background-dark my-6"></div>
-        <div class="py-3 mt-4">
-          <label class="flex flex-col w-full">
-            <p class="text-[#111813] dark:text-white text-base font-medium leading-normal pb-2">Categorías iniciales</p>
-            <div class="flex flex-wrap gap-2 items-center p-3 border border-[#dce5df] dark:border-[#3a4c41] rounded-lg bg-white dark:bg-[#112116] min-h-14">
-              <!-- keep this area static for now; could be converted to dynamic tags later -->
-              <div class="flex items-center gap-1 bg-primary/20 text-primary font-medium px-3 py-1 rounded-full text-sm">
-                <span>Comida</span>
-                <button class="text-primary/70 hover:text-primary" type="button">
-                  <span class="material-symbols-outlined text-base">close</span>
-                </button>
-              </div>
-              <div class="flex items-center gap-1 bg-primary/20 text-primary font-medium px-3 py-1 rounded-full text-sm">
-                <span>Transporte</span>
-                <button class="text-primary/70 hover:text-primary" type="button">
-                  <span class="material-symbols-outlined text-base">close</span>
-                </button>
-              </div>
-              <input class="form-input flex-1 min-w-[150px] bg-transparent border-0 focus:ring-0 text-[#111813] dark:text-white placeholder:text-[#63886f] dark:placeholder:text-[#a2bba9] text-base" placeholder="Añadir otra categoría..." type="text" />
-            </div>
-          </label>
-        </div>
         <div class="flex justify-end pt-8">
           <button type="submit" class="flex items-center justify-center gap-2 h-12 px-6 rounded-lg bg-primary text-white font-bold leading-normal">Guardar Cambios</button>
         </div>
