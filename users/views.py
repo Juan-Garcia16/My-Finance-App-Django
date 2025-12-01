@@ -17,10 +17,7 @@ from decimal import ROUND_HALF_UP
 
 
 def format_cop(value):
-	"""Format a numeric/Decimal value as Colombian pesos display (no cents).
-
-	Examples:
-		Decimal('1100000.00') -> '1.100.000'
+	"""Formato numerico para pesos colombianos COP (sin decimales).
 	"""
 	if value is None:
 		return ''
@@ -32,7 +29,7 @@ def format_cop(value):
 		except Exception:
 			return str(value)
 
-	# Round to whole pesos
+	# Redondear a pesos enteros
 	try:
 		amt = amt.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
 	except Exception:
@@ -46,98 +43,55 @@ def format_cop(value):
 		except Exception:
 			return str(value)
 
+	# Reemplazar comas por puntos para formato COP
 	return s.replace(',', '.')
 
 
-class CustomLoginView(LoginView):
-	template_name = 'users/login.html'
+def build_daily_series(profile, year, month):
+	"""Construye las series diarias para el gráfico del dashboard.
 
+	Devuelve una tupla (labels, ingresos_by_day, gastos_by_day) donde:
+	- labels: lista de strings con los días del mes ('01', '02', ...)
+	- ingresos_by_day: lista de floats con la suma de ingresos por día
+	- gastos_by_day: lista de floats con la suma de gastos por día
 
-class CustomLogoutView(LogoutView):
-	next_page = reverse_lazy('users:login')
-
-
-def register_view(request):
-	if request.method == 'POST':
-		form = UserRegisterForm(request.POST)
-		if form.is_valid():
-			user = form.save()
-			# Optionally create Profile via signal or here if desired
-			login(request, user)
-			return redirect('users:dashboard')
-	else:
-		form = UserRegisterForm()
-	return render(request, 'users/register.html', {'form': form})
-
-
-@login_required
-def dashboard_view(request):
-	# You can add context data (balances, transactions) here
-	# Ensure the user has a Profile (create default if missing)
-	profile, created = Profile.objects.get_or_create(
-		user=request.user,
-		defaults={
-			'moneda_preferida': 'COP',
-			'saldo_inicial': 0,
-			'saldo_actual': 0,
-		}
-	)
-	# calcular totales del mes actual
-	now = timezone.now()
-	year = now.year
-	month = now.month
-
-	ingresos_agg = Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
-	gastos_agg = Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
-
-	ingresos_total = ingresos_agg['total'] or Decimal('0.00')
-	gastos_total = gastos_agg['total'] or Decimal('0.00')
-
-	context = {
-		'profile': profile,
-		'ingresos_mes': ingresos_total,
-		'gastos_mes': gastos_total,
-		# display versions (formatted as COP)
-		'saldo_actual_display': format_cop(profile.saldo_actual),
-		'ingresos_mes_display': format_cop(ingresos_total),
-		'gastos_mes_display': format_cop(gastos_total),
-	}
-
-	# build daily series for current month (labels: days)
-	# days count
+	La función es defensiva: ignora transacciones con datos inválidos en la fecha
+	o monto para no romper la generación del gráfico.
+	"""
+	# Número de días del mes
 	days_in_month = calendar.monthrange(year, month)[1]
 	labels = [f"{d:02d}" for d in range(1, days_in_month + 1)]
 
-	# initialize zeros
 	ingresos_by_day = [0.0] * days_in_month
 	gastos_by_day = [0.0] * days_in_month
 
-	# aggregate ingresos by day
 	ingresos_days_qs = Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month)
 	for inc in ingresos_days_qs:
 		try:
 			day = inc.fecha.day
-			ingresos_by_day[day-1] += float(inc.monto or 0)
+			ingresos_by_day[day - 1] += float(inc.monto or 0)
 		except Exception:
 			continue
 
-	# aggregate gastos by day
 	gastos_days_qs = Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month)
 	for g in gastos_days_qs:
 		try:
 			day = g.fecha.day
-			gastos_by_day[day-1] += float(g.monto or 0)
+			gastos_by_day[day - 1] += float(g.monto or 0)
 		except Exception:
 			continue
 
-	# prepare JSON for template
-	context['chart_labels_json'] = json.dumps(labels)
-	context['ingresos_data_json'] = json.dumps(ingresos_by_day)
-	context['gastos_data_json'] = json.dumps(gastos_by_day)
-	# Obtener últimas transacciones (ingresos + gastos) y ordenar por fecha descendente
-	# incluimos el color de la categoría para mostrarlo en el dashboard
-	ingresos_qs = Ingreso.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'categoria__color', 'monto', 'fecha', 'descripcion')
-	gastos_qs = Gasto.objects.filter(usuario=profile).values('id', 'categoria__nombre', 'categoria__color', 'monto', 'fecha', 'descripcion')
+	return labels, ingresos_by_day, gastos_by_day
+
+
+def build_recent_transactions(profile, limit=5):
+	"""Recupera y normaliza las últimas transacciones (ingresos + gastos)"""
+	ingresos_qs = Ingreso.objects.filter(usuario=profile).values(
+		'id', 'categoria__nombre', 'categoria__color', 'monto', 'fecha', 'descripcion'
+	)
+	gastos_qs = Gasto.objects.filter(usuario=profile).values(
+		'id', 'categoria__nombre', 'categoria__color', 'monto', 'fecha', 'descripcion'
+	)
 
 	recent = []
 	for i in ingresos_qs:
@@ -163,17 +117,89 @@ def dashboard_view(request):
 			'descripcion': g.get('descripcion') or '',
 		})
 
-	# ordenar por fecha (y luego id) descendente
+	# ordenar por fecha (y luego id) descendente y limitar
 	recent_sorted = sorted(recent, key=lambda r: (r['fecha'], r['id']), reverse=True)
-	recent_top5 = recent_sorted[:5]
+	return recent_sorted[:limit]
 
-	context['recent_transactions'] = recent_top5
+# Vista para logeo de usuarios
+class CustomLoginView(LoginView):
+	template_name = 'users/login.html'
+
+# Vista para logout de usuarios
+class CustomLogoutView(LogoutView):
+	next_page = reverse_lazy('users:login')
+
+# Vista para registro de nuevos usuarios
+def register_view(request):
+	if request.method == 'POST':
+		form = UserRegisterForm(request.POST)
+		if form.is_valid():
+			user = form.save()
+			# Logear de forma automática al registrarse
+			login(request, user)
+			return redirect('users:dashboard')
+	else:
+		# Mostrar formulario vacío para registro
+		form = UserRegisterForm()
+	return render(request, 'users/register.html', {'form': form})
+
+
+# Vista principal del dashboard
+@login_required
+def dashboard_view(request):
+    # Asegurar que el perfil exista y obtener sus datos
+	profile, created = Profile.objects.get_or_create(
+		user=request.user,
+		defaults={
+			'moneda_preferida': 'COP',
+			'saldo_inicial': 0,
+			'saldo_actual': 0,
+		}
+	)
+	
+	# Variables para el contexto de analisis y registro mensual de los datos
+	now = timezone.now()
+	year = now.year
+	month = now.month
+
+	# ingresos y gastos totales del mes actual
+	ingresos_agg = Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
+	gastos_agg = Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
+
+	# ingresos y gastos totales como Decimals
+	ingresos_total = ingresos_agg['total'] or Decimal('0.00')
+	gastos_total = gastos_agg['total'] or Decimal('0.00')
+
+	# preparar contexto para render
+	context = {
+		'profile': profile,
+		'ingresos_mes': ingresos_total,
+		'gastos_mes': gastos_total,
+		# Valores formateados a COP 
+		'saldo_actual_display': format_cop(profile.saldo_actual),
+		'ingresos_mes_display': format_cop(ingresos_total),
+		'gastos_mes_display': format_cop(gastos_total),
+	}
+
+    # Series diarias para el gráfico 
+    # Número de días del mes (ej. 30/31/28)
+	labels, ingresos_by_day, gastos_by_day = build_daily_series(profile, year, month)
+ 
+	# Preparar JSON para el frontend (Chart.js)
+	context['chart_labels_json'] = json.dumps(labels)
+	context['ingresos_data_json'] = json.dumps(ingresos_by_day)
+	context['gastos_data_json'] = json.dumps(gastos_by_day)
+ 
+ 
+	# Últimas transacciones para vista en el dashboard
+	context['recent_transactions'] = build_recent_transactions(profile, limit=5)
 
 	return render(request, 'dashboard.html', context)
 
 @login_required
 def profile_view(request):
-	# Ensure profile exists
+	'''Vista para ver y actualizar el perfil del usuario.'''
+	# asegurar existencia
 	profile, created = Profile.objects.get_or_create(
 		user=request.user,
 		defaults={
@@ -184,6 +210,7 @@ def profile_view(request):
 	)
 
 	if request.method == 'POST':
+		# user form de django y profile form de la palicacion
 		u_form = UserUpdateForm(request.POST, instance=request.user)
 		p_form = ProfileUpdateForm(request.POST, instance=profile)
 		if u_form.is_valid() and p_form.is_valid():
@@ -194,6 +221,7 @@ def profile_view(request):
 		else:
 			messages.error(request, 'Por favor corrige los errores en el formulario.')
 	else:
+		# forms con datos iniciales
 		u_form = UserUpdateForm(instance=request.user)
 		p_form = ProfileUpdateForm(instance=profile)
 
