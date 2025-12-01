@@ -4,6 +4,7 @@ from categories.models import Category
 
 
 class BudgetForm(forms.ModelForm):
+    '''Formulario para crear o editar un presupuesto'''
     # Use HTML month input to get YYYY-MM value
     mes = forms.CharField(
         widget=forms.TextInput(attrs={'type': 'month', 'class': 'border rounded px-2 py-1'}),
@@ -25,6 +26,7 @@ class BudgetForm(forms.ModelForm):
             self.fields['categoria'].queryset = Category.objects.filter(usuario=usuario)
 
     def clean_mes(self):
+        ''' Validar el formato del mes '''
         mes = self.cleaned_data['mes']
         # esperar formato 'YYYY-MM'
         if not isinstance(mes, str) or len(mes) < 7 or '-' not in mes:

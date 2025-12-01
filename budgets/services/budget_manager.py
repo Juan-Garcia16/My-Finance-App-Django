@@ -6,6 +6,7 @@ class BudgetManager:
         self.usuario = usuario_profile
 
     def crear_presupuesto(self, categoria_id, limite, mes):
+        '''Crea un nuevo presupuesto para una categoría y mes específicos'''
         categoria = Category.objects.get(id=categoria_id, usuario=self.usuario)
         return Presupuesto.objects.create(
             usuario=self.usuario,
@@ -15,6 +16,7 @@ class BudgetManager:
         )
 
     def estado_presupuesto(self, categoria_id):
+        '''Verifica el estado del presupuesto para una categoría específica (limites del presupuesto)'''
         try:
             presupuesto = Presupuesto.objects.get(
                 usuario=self.usuario,

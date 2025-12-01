@@ -4,9 +4,10 @@ from django.urls import reverse
 from .forms import BudgetForm
 from .models import Presupuesto
 
-
+#Lista todos los presupuestos del usuario y permite crear nuevos
 def budgets_list(request):
 	profile = request.user.profile
+ 
 	if request.method == 'POST':
 		form = BudgetForm(request.POST, usuario=profile)
 		if form.is_valid():
@@ -30,7 +31,8 @@ def budgets_list(request):
 		else:
 			# render con errors y abrir modal en template
 			budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria').order_by('-mes', '-pk')
-			# calcular estado
+			
+            # calcular estado
 			for p in budgets:
 				try:
 					p.porcentaje = float(p.gasto_actual) / float(p.limite) * 100 if p.limite and p.limite != 0 else 0
@@ -72,7 +74,7 @@ def delete_budget(request, pk):
 		presupuesto.delete()
 		messages.success(request, 'Presupuesto eliminado.', extra_tags='budgets')
 		return redirect(reverse('budgets:list'))
-	# Usamos confirm() del navegador; redirigimos si se accede por GET
+
 	return redirect(reverse('budgets:list'))
 
 
@@ -86,7 +88,7 @@ def edit_budget(request, pk):
 			messages.success(request, 'Presupuesto actualizado.', extra_tags='budgets')
 			return redirect(reverse('budgets:list'))
 		else:
-			# render same template with modal open and errors
+			#  rendereizar mismo template con modal abierta y errores
 			budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria').order_by('-mes', '-pk')
 			for p in budgets:
 				try:

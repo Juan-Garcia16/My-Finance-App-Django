@@ -16,7 +16,8 @@ class Presupuesto(models.Model):
         self.save()
 
     def verificar_limite(self):
-        return self.gasto_actual >= self.limite # True si se ha alcanzado o superado el límite
+        '''Verifica si el gasto actual ha alcanzado o superado el límite del presupuesto (True/False)'''
+        return self.gasto_actual >= self.limite 
 
     def __str__(self):
         return f"{self.categoria.nombre} - {self.mes}"

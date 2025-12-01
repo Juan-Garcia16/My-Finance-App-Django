@@ -5,11 +5,14 @@ from budgets.models import Presupuesto
 
 
 def _mes_key_from_date(fecha):
+    '''Dada una fecha, devuelve la clave de mes en formato 'YYYY-MM' '''
     return f"{fecha.year:04d}-{fecha.month:02d}"
 
-
+# receivers para actualizar presupuestos al crear/editar/eliminar gastos
 @receiver(pre_save, sender=Gasto)
 def gasto_pre_save(sender, instance, **kwargs):
+    '''Guarda el estado previo del gasto antes de guardarlo para poder revertir cambios en post_save'''
+    
     # Si existe en DB, guardar estado previo para poder revertir en post_save
     if instance.pk:
         try:
@@ -29,6 +32,8 @@ def gasto_pre_save(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Gasto)
 def gasto_post_save(sender, instance, created, **kwargs):
+    '''Actualiza el gasto_actual del presupuesto asociado al gasto creado o editado'''
+    
     # Si editamos, primero revertimos el monto anterior en su presupuesto (si aplica)
     try:
         # Revertir monto anterior si fue editado
@@ -63,6 +68,7 @@ def gasto_post_save(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=Gasto)
 def gasto_post_delete(sender, instance, **kwargs):
+    '''Revertir el gasto_actual del presupuesto asociado al gasto eliminado'''
     try:
         mes_key = _mes_key_from_date(instance.fecha)
         try:
