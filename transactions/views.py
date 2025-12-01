@@ -11,7 +11,7 @@ from decimal import Decimal, ROUND_HALF_UP
 
 
 def _format_cop(value):
-    """Format a numeric/Decimal value as Colombian pesos display (no cents)."""
+    """Formato numerico para pesos colombianos COP (sin decimales)"""
     if value is None:
         return ''
     try:
@@ -38,29 +38,32 @@ def _format_cop(value):
 
 @login_required
 def transactions_list(request):
+    '''Lista todas las transacciones del usuario (ingresos y gastos mezclados)'''
     profile = Profile.objects.get(user=request.user)
     manager = TransactionManager(profile)
 
-    if request.method == 'POST':
-        form = TransactionForm(request.POST, usuario=profile)
-        if form.is_valid():
-            try:
-                manager.registrar_transaccion(
-                    form.cleaned_data['tipo'],
-                    form.cleaned_data['categoria'].id,
-                    form.cleaned_data['monto'],
-                    form.cleaned_data['fecha'],
-                    form.cleaned_data.get('descripcion', ''),
-                )
-                messages.success(request, 'Transacción registrada.', extra_tags='transactions')
-                return redirect('transactions:list')
-            except Exception as e:
-                messages.error(request, str(e), extra_tags='transactions')
-    else:
-        form = TransactionForm(usuario=profile)
+    # if request.method == 'POST':
+    #     form = TransactionForm(request.POST, usuario=profile)
+    #     if form.is_valid():
+    #         try:
+    #             manager.registrar_transaccion(
+    #                 form.cleaned_data['tipo'],
+    #                 form.cleaned_data['categoria'].id,
+    #                 form.cleaned_data['monto'],
+    #                 form.cleaned_data['fecha'],
+    #                 form.cleaned_data.get('descripcion', ''),
+    #             )
+    #             messages.success(request, 'Transacción registrada.', extra_tags='transactions')
+    #             return redirect('transactions:list')
+    #         except Exception as e:
+    #             messages.error(request, str(e), extra_tags='transactions')
+    # else:
+    #     # formulario en blanco
+    form = TransactionForm(usuario=profile)
 
     transactions = manager.listar_transacciones()
-    # attach display string to each transaction for templates
+
+    # Formatear todas las transacciones a COP
     for tx in transactions:
         try:
             tx.monto_display = _format_cop(tx.monto)
@@ -71,6 +74,7 @@ def transactions_list(request):
 
 @login_required
 def transactions_create(request):
+    '''Crea una nueva transacción (ingreso o gasto)'''
     profile = Profile.objects.get(user=request.user)
     manager = TransactionManager(profile)
 
@@ -97,6 +101,7 @@ def transactions_create(request):
 
 @login_required
 def transaction_edit(request, tipo, pk):
+    '''Edita una transacción existente (ingreso o gasto)'''
     profile = Profile.objects.get(user=request.user)
     manager = TransactionManager(profile)
 
@@ -110,18 +115,21 @@ def transaction_edit(request, tipo, pk):
         form = TransactionForm(request.POST, usuario=profile)
         if form.is_valid():
             try:
-                manager.editar_transaccion(tipo, pk,
-                                            form.cleaned_data['tipo'],
-                                            form.cleaned_data['categoria'].id,
-                                            form.cleaned_data['monto'],
-                                            form.cleaned_data['fecha'],
-                                            form.cleaned_data.get('descripcion', ''),
-                                            )
+                manager.editar_transaccion(
+                    tipo, 
+                    pk,
+                    form.cleaned_data['tipo'],
+                    form.cleaned_data['categoria'].id,
+                    form.cleaned_data['monto'],
+                    form.cleaned_data['fecha'],
+                    form.cleaned_data.get('descripcion', ''),
+                )
                 messages.success(request, 'Transacción actualizada.', extra_tags='transactions')
                 return redirect('transactions:list')
             except Exception as e:
                 messages.error(request, str(e), extra_tags='transactions')
     else:
+        # initial para el formulario en con los datos a editar
         initial = {
             'tipo': tipo,
             'categoria': trans.categoria,
@@ -136,6 +144,8 @@ def transaction_edit(request, tipo, pk):
 
 @login_required
 def transaction_delete(request, tipo, pk):
+    '''Elimina una transacción (ingreso o gasto)'''
+    
     profile = Profile.objects.get(user=request.user)
     manager = TransactionManager(profile)
     if request.method == 'POST':
@@ -147,4 +157,3 @@ def transaction_delete(request, tipo, pk):
     return redirect('transactions:list')
 from django.shortcuts import render
 
-# Create your views here.

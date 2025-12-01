@@ -17,8 +17,7 @@ from decimal import ROUND_HALF_UP
 
 
 def format_cop(value):
-	"""Formato numerico para pesos colombianos COP (sin decimales).
-	"""
+	"""Formato numerico para pesos colombianos COP (sin decimales)"""
 	if value is None:
 		return ''
 	try:

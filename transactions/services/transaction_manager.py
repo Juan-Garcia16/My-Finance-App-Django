@@ -6,6 +6,9 @@ class TransactionManager:
         self.usuario = usuario_profile
 
     def registrar_transaccion(self, tipo, categoria, monto, fecha, descripcion=""):
+        '''Registra una nueva transacción (ingreso o gasto) y actualiza el saldo del usuario'''
+        
+        # categoria asociada a la transaccion
         categoria_obj = Category.objects.get(id=categoria, usuario=self.usuario)
 
         if tipo == "ingreso":
@@ -27,16 +30,16 @@ class TransactionManager:
 
         # polimorfismo: cada tipo implementa su lógica
         transaccion.registrar()
-
-        # NOTA: la lógica de actualización de presupuestos se maneja en el módulo budgets
-        # mediante señales para evitar duplicados y problemas de mes/alcance.
-
+        
         return transaccion
 
 
 
     def listar_transacciones(self):
-        # devuelve lista mezclada de ingresos y gastos, cada item tiene atributo 'tipo' para identificar
+        '''Devuelve una lista mezclada de ingresos y gastos, cada item tiene 
+           atributo 'tipo_transaccion' para identificar'''
+        
+        # ingresos del usuario especifico
         ingresos = list(Ingreso.objects.filter(usuario=self.usuario))
         for i in ingresos:
             setattr(i, 'tipo_transaccion', 'ingreso')
@@ -44,13 +47,16 @@ class TransactionManager:
         for g in gastos:
             setattr(g, 'tipo_transaccion', 'gasto')
 
+        # all_tx mezcla ambos tipos de transacciones
         all_tx = ingresos + gastos
+        
         # ordenar por fecha descendente
         all_tx.sort(key=lambda x: x.fecha, reverse=True)
         return all_tx
 
     def eliminar_transaccion(self, tipo, transaccion_id):
-        # reversa el efecto en el saldo y actualiza presupuesto si aplica
+        '''Elimina una transacción y revierte su efecto en el saldo del usuario'''
+        
         if tipo == 'ingreso':
             trans = Ingreso.objects.get(id=transaccion_id, usuario=self.usuario)
             # restar el ingreso del saldo
@@ -64,6 +70,7 @@ class TransactionManager:
         return True
 
     def editar_transaccion(self, tipo, transaccion_id, nuevo_tipo, nueva_categoria, nuevo_monto, nueva_fecha, nueva_descripcion=""):
+        '''Edita una transacción existente y ajusta el saldo del usuario según los cambios'''
         # Para simplificar: eliminamos la transacción antigua (revirtiendo efectos) y creamos una nueva
         # Obtener y revertir antigua
         if tipo == 'ingreso':

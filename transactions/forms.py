@@ -7,7 +7,6 @@ TIPO_CHOICES = [
     ("gasto", "Gasto"),
 ]
 
-
 class TransactionForm(forms.Form):
     shared_input_classes = 'block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark text-text-main dark:text-text-main-dark px-3 py-2'
 
@@ -42,6 +41,7 @@ class TransactionForm(forms.Form):
         })
     )
 
+    # constructor para limitar categorías por usuario
     def __init__(self, *args, **kwargs):
         usuario = kwargs.pop('usuario', None)
         super().__init__(*args, **kwargs)
