@@ -128,6 +128,19 @@
               </td>
               <td class="h-[72px] px-6 py-4 whitespace-nowrap text-sm font-medium {% if tx.tipo_transaccion == 'ingreso' %}text-[#27ae60]{% else %}text-red-600{% endif %}">
                 {% if tx.tipo_transaccion == 'ingreso' %}+{{ tx.monto_display }}{% else %}-{{ tx.monto_display }}{% endif %}
+                {% if tx.budget_status %}
+                  <span class="ml-3 inline-flex items-center" title="{{ tx.budget_message }}" aria-label="{{ tx.budget_message }}">
+                    {% if tx.budget_status == 'over' %}
+                      <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700" title="{{ tx.budget_message }}">
+                        <span class="material-symbols-outlined text-[18px] leading-none" aria-hidden="true">error</span>
+                      </span>
+                    {% elif tx.budget_status == 'near' %}
+                      <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-yellow-100 text-yellow-800" title="{{ tx.budget_message }}">
+                        <span class="material-symbols-outlined text-[18px] leading-none" aria-hidden="true">warning_amber</span>
+                      </span>
+                    {% endif %}
+                  </span>
+                {% endif %}
               </td>
               <td class="h-[72px] px-6 py-4 whitespace-nowrap text-[#636f88] dark:text-gray-400 text-sm font-normal">{{ tx.fecha }}</td>
               <td class="h-[72px] px-6 py-4 text-[#636f88] dark:text-gray-400 text-sm font-normal">
