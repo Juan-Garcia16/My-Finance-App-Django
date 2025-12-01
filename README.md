@@ -1,67 +1,252 @@
-# My Finance App Django
+# MyFinanceApp — Documentación Técnica
 
-Aplicación web para gestión personal de finanzas desarrollada con Django. Permite llevar transacciones (ingresos/gastos), categorías, presupuestos mensuales, metas de ahorro y reportes visuales.
+**Contexto del Desarrollo**
 
-**Resumen rápido**
-- **Stack**: Python + Django (5.2.x), TailwindCSS para estilos, Chart.js para gráficos, plantillas Django y Material Symbols.
-- **Propósito**: ayudar al usuario a registrar ingresos/gastos, fijar presupuestos por categoría/mes, seguir metas de ahorro y ver reportes gráficos fáciles de interpretar.
+MyFinanceApp es una aplicación web para el control de finanzas personales. Permite a cada usuario gestionar transacciones (ingresos y gastos), categorías, metas de ahorro, presupuestos mensuales y generar reportes estadísticos y visuales por mes y por año.
 
-**Módulos principales**
-- **`users`**: gestión del perfil del usuario (modelo `Profile`), vistas relacionadas con el tablero (dashboard) y utilidades de usuario.
-- **`categories`**: definición y gestión de categorías de transacciones (cada categoría tiene color y nombre).
-- **`transactions`**: registro y edición de transacciones (`Ingreso` y `Gasto`). Incluye:
-	- Formulario y vistas para crear/editar/eliminar transacciones.
-	- `TransactionManager` (servicio) que centraliza la lógica de creación, edición y listado.
-	- Plantilla `templates/transactions/transactions.html` que muestra lista filtrable y compacta.
-	- Lógica para mostrar alertas visuales cuando una transacción afecta un `Presupuesto` cercano o sobrepasado.
-- **`budgets`** (presupuestos): gestión de presupuestos mensuales por categoría.
-	- Modelo `Presupuesto` con campos `usuario`, `categoria`, `mes` (formato `YYYY-MM`), `limite` y `gasto_actual`.
-	- Señales que mantienen `gasto_actual` sincronizado cuando se crean/edita/eliminan transacciones.
-	- CRUD de presupuestos con modal en la interfaz.
-- **`goals`** (metas de ahorro): crear metas, aportar dinero y control de progreso.
-	- Nota: existe una vista utilitaria `recalculate_progress_from_transactions` (en `goals/views.py`) que recalcula progreso desde transacciones siguiendo la convención `meta:<id>`, pero actualmente no es usada por otras partes del sistema; se recomienda convertirla en un comando de management o eliminarla si no se necesita.
-- **`reports`**: vistas y plantillas que generan reportes por mes y por categoría.
-	- Usa `Chart.js` para doughnuts y series de cashflow en dashboard/reports.
+**Integrantes del grupo**
 
-**Decisiones de arquitectura**
-- Se usa una capa de *services* (por ejemplo `TransactionManager`) para encapsular lógica de negocio y mantener las vistas limpias.
-- Las actualizaciones de `Presupuesto.gasto_actual` se realizan mediante *signals* para asegurar un único origen de la verdad.
-- El formateo de valores (pesos colombianos) se hace tanto en vistas (`_format_cop`) como, en algunos puntos, con filtros JS para tooltips de Chart.js.
+- **Juan Pablo García** — Autor / Desarrollador principal
 
-**Flujos y UX relevantes**
-- Al crear/editar un gasto se verifica el presupuesto correspondiente al `mes` y `categoria`. Si el gasto lleva el total del presupuesto por encima de un umbral, se muestra:
-	- Icono de advertencia (cerca de llenarse, por defecto >= 80%).
-	- Icono de error (alcanzado/sobrepasado, >= 100%).
-	- Mensajes flash (`messages.warning` / `messages.error`) cuando aplica.
-- La lista de transacciones incluye iconos compactos con tooltip indicando el estado del presupuesto.
+**Tecnologías y librerías implementadas**
 
-**Archivos y rutas clave**
-- `transactions/views.py` — vistas: `transactions_list`, `transactions_create`, `transaction_edit`, `transaction_delete`.
-- `transactions/services/transaction_manager.py` — lógica de creación/edición/listado de transacciones.
-- `templates/transactions/transactions.html` — interfaz principal de transacciones y filtros cliente.
-- `budgets/models.py` — modelo `Presupuesto`.
-- `budgets/signals.py` — señales que sincronizan `gasto_actual` con transacciones.
-- `goals/views.py` — gestión de metas (la vista `recalculate_progress_from_transactions` existe pero no se usa automáticamente).
-- `reports/views.py` y `templates/reports/reports.html` — cálculo y render de reportes mensuales y gráficos.
-- `users/views.py` — `dashboard_view` que construye series diarias y transacciones recientes.
+- **Backend:** `Django 5.2.8`
+- **Base de datos:** `PostgreSQL` (driver: `psycopg2-binary`)
+- **Gestión de configuración:** `python-decouple`
+- **Frontend:** Tailwind CSS (clases usadas en templates)
+- **Dependencias listadas:** ver `requirements.txt`
 
-**Instalación y ejecución (desarrollo)**
-1. Crear y activar un entorno virtual (por ejemplo `venv`):
+Resumen de `requirements.txt`:
+
+- `Django==5.2.8`
+- `psycopg2-binary==2.9.11`
+- `python-decouple==3.8`
+- `asgiref==3.10.0`
+- `sqlparse==0.5.3`
+
+**Temática / Propósito**
+
+Proveer una herramienta simple y centrada en el usuario final para visualizar y controlar su estado financiero mensual y anual, con atención a: seguimiento de transacciones, categorización, presupuestos por categoría/mes, metas de ahorro y reportes visuales (gráficas de líneas y torta).
+
+**Flujo de Trabajo (resumen funcional por módulos)**
+
+- **Módulo de Usuario**: Registro (nombre, correo, contraseña, saldo inicial), Login (usuario y contraseña). En el `dashboard` se muestra: balance total, ingresos totales mes actual, gastos totales mes actual, gráfica de ingresos/gastos por día, últimas 5 transacciones y botón para nueva transacción. Acceso a configuración de perfil y logout.
+- **Módulo de Categorías**: Crear/editar/eliminar categorías (nombre, tipo ingreso/gasto, color). No se permiten duplicados por usuario.
+- **Módulo de Transacciones**: Crear/editar/eliminar transacciones con: tipo (ingreso/gasto), categoría, monto, fecha, descripción. Afectan saldo del `Profile`, presupuestos y reportes. Listado con búsqueda y filtros (fechas, categoría, tipo).
+- **Módulo de Metas (Goals)**: Crear metas con nombre, monto objetivo y fecha límite. Registrar aportes (no restan del saldo) que incrementan progreso y porcentaje de la meta.
+- **Módulo de Presupuestos**: Crear presupuesto por categoría y mes (mes de año) con monto límite; muestra barra progresiva y estado (dentro, cerca, superado). Las transacciones del mes y categoría aumentan `gasto_actual`.
+- **Módulo de Reportes**: Vista por mes con ingresos totales, gastos totales, ahorro neto (ingresos - gastos), gráficos de torta por categoría (gastos e ingresos) y estado de presupuestos. Navegador por mes/año.
+
+**Requerimientos funcionales**
+
+- RF1: Registro de usuario con `nombre`, `email`, `contraseña` y `saldo_inicial`.
+- RF2: Login y logout seguro (redirecciones configuradas en `settings.py`).
+- RF3: Visualización de `dashboard` con métricas (balance, ingresos, gastos, gráfica diaria, últimas 5 transacciones).
+- RF4: CRUD de `Categorías` por usuario (nombre, tipo, color); evitar duplicados.
+- RF5: CRUD de `Transacciones` (ingresos/gastos) con impacto en el saldo del `Profile`.
+- RF6: Búsqueda y filtrado de transacciones por atributos, rango de fechas, categoría y tipo.
+- RF7: CRUD de `Metas` y registro de aportes que incrementen su progreso.
+- RF8: CRUD de `Presupuestos` por categoría/mes y cálculo de `gasto_actual` impactado por transacciones.
+- RF9: Reportes mensuales con gráficas (torta y líneas) y navegador por mes/año.
+
+**Requerimientos no funcionales**
+
+- RNF1: Persistencia de datos en PostgreSQL.
+- RNF2: Seguridad básica proporcionada por `Django Auth` (hashing de contraseñas, sesiones).
+- RNF3: Respuesta de la UI responsiva (uso de Tailwind CSS para estilos y layout ligero).
+- RNF4: Código organizado por apps (`users`, `transactions`, `categories`, `budgets`, `goals`, `reports`).
+- RNF5: Rotinas en los servicios para encapsular negocio (clases `*Manager` para lógica de dominio).
+- RNF6: Validaciones para evitar duplicidad de categorías y evitar eliminar entidades con dependencias.
+
+**Estructura de modelos y relaciones (resumen extraído del código)**
+
+- `Profile` (`users.models.Profile`)
+  - Atributos: `user (OneToOneField->auth.User)`, `moneda_preferida`, `saldo_inicial`, `saldo_actual`
+  - Métodos: `actualizar_saldo(monto)`
+  - Colaboradores: `Transaccion` (`Ingreso`, `Gasto`), `Category`, `Presupuesto`, `MetaAhorro`
+
+- `Category` (`categories.models.Category`)
+  - Atributos: `usuario (ForeignKey->Profile)`, `nombre`, `tipo`, `color`
+  - Colaboradores: `Ingreso`, `Gasto`, `Presupuesto`
+
+- `Transaccion` (abstracto) / `Ingreso`, `Gasto` (`transactions.models`)
+  - Atributos: `usuario (FK->Profile)`, `categoria (FK->Category)`, `monto`, `fecha`, `descripcion`
+  - Métodos: `get_monto()`, `registrar()` (implementado en `Ingreso` y `Gasto` para actualizar saldo)
+  - Colaboradores: `Profile`, `Category`, `Presupuesto` (indirectamente)
+
+- `Presupuesto` (`budgets.models.Presupuesto`)
+  - Atributos: `usuario (FK->Profile)`, `categoria (FK->Category)`, `mes`, `limite`, `gasto_actual`
+  - Métodos: `actualizar_gasto(monto)`, `verificar_limite()`
+  - Colaboradores: `Category`, `Transaccion`
+
+- `MetaAhorro` (`goals.models.MetaAhorro`)
+  - Atributos: `usuario (FK->Profile)`, `nombre`, `monto_objetivo`, `fecha_limite`, `progreso`
+  - Métodos: `actualizar_progreso(monto)`, `porcentaje_progreso()`
+
+**Tarjetas CRC (Clase — Responsabilidades — Colaboradores)**
+
+                                  Profile
+---------------------------------------------------------------------
+RESPONSABILIDADES:            |  COLABORADORES
+- Mantener `saldo_actual`      | `auth.User` (OneToOne)
+- Actualizar saldo con trans.  | `Ingreso`, `Gasto` (llaman `actualizar_saldo`)
+atributos: user, moneda_preferida, | `Presupuesto` (consulta/actualiza gasto_actual)
+saldo_inicial, saldo_actual      | `MetaAhorro` (relacionado por usuario)
+metodos: actualizar_saldo(monto)
+
+
+                                  Category
+---------------------------------------------------------------------
+RESPONSABILIDADES:            |  COLABORADORES
+- Guardar metadata de categoría | `Profile` (propietario)
+- Evitar duplicados por usuario| `Ingreso`, `Gasto` (FK), `Presupuesto`
+atributos: usuario, nombre, tipo, color | metodos CRUD en `CategoryManager`
+
+
+                                  Ingreso / Gasto
+---------------------------------------------------------------------
+RESPONSABILIDADES:            |  COLABORADORES
+- Registrar transacción         | `Profile` (actualizar saldo)
+- Mantener datos transacción    | `Category` (FK)
+atributos: usuario, categoria, monto, fecha, descripcion | `TransactionManager` (crear/listar/editar/eliminar)
+metodos: registrar() (aumenta o disminuye saldo)
+
+
+                                  Presupuesto
+---------------------------------------------------------------------
+RESPONSABILIDADES:            |  COLABORADORES
+- Controlar límite por mes      | `Profile` (pertenece a un usuario)
+- Actualizar `gasto_actual`     | `Category` (FK)
+atributos: usuario, categoria, mes, limite, gasto_actual | `BudgetManager` (crear / estado)
+metodos: actualizar_gasto(monto), verificar_limite()
+
+
+                                  MetaAhorro
+---------------------------------------------------------------------
+RESPONSABILIDADES:            |  COLABORADORES
+- Mantener progreso de meta     | `Profile` (propietario)
+- Calcular porcentaje y evitar overflow | `GoalManager` (crear / añadir progreso)
+atributos: usuario, nombre, monto_objetivo, fecha_limite, progreso | metodos: actualizar_progreso(monto), porcentaje_progreso()
+
+
+**Diagrama de clases (texto / relaciones principales)**
+
+- `auth.User` 1 --- 1 `Profile`
+- `Profile` 1 --- * `Category`
+- `Profile` 1 --- * `Ingreso`
+- `Profile` 1 --- * `Gasto`
+- `Profile` 1 --- * `Presupuesto`
+- `Profile` 1 --- * `MetaAhorro`
+- `Category` 1 --- * `Ingreso` / `Gasto`
+- `Category` 1 --- * `Presupuesto`
+
+(Sugerencia: si desea un diagrama visual, puedo generar un diagrama PlantUML o un PNG a partir de esta estructura.)
+
+**Casos de Uso (lista resumida)**
+
+ID | Actor Principal | Nombre
+---|-----------------|-------
+UC01 | Usuario | Registro de cuenta
+UC02 | Usuario | Login al sistema
+UC03 | Usuario | Ver Dashboard
+UC04 | Usuario | Crear/Cambiar categoría
+UC05 | Usuario | Crear transacción (ingreso/gasto)
+UC06 | Usuario | Editar/Eliminar transacción
+UC07 | Usuario | Crear meta de ahorro
+UC08 | Usuario | Aportar a meta
+UC09 | Usuario | Crear presupuesto por categoría/mes
+UC10 | Usuario | Ver Reportes mensuales
+
+
+Formato detallado de casos de uso
+
+Nombre: Registro de cuenta
+Codigo: UC01
+Creado por: Juan Pablo García
+Fecha de Creacion: 01-12-2025
+Actores: Usuario (no autenticado)
+Descripcion: Permite a un usuario crear una cuenta proporcionando nombre de usuario, correo, contraseña y saldo inicial.
+Disparador: Usuario accede a la página de registro y envía el formulario.
+Pre-Condiciones: El usuario no debe estar autenticado; el nombre/correo no deben existir ya.
+Post-Condiciones: Usuario creado en `auth.User` y `Profile` con `saldo_inicial` establecido; sesión iniciada o redirigido al login.
+Flujo normal:
+1. Usuario llena formulario con nombre, correo, contraseña y saldo inicial.
+2. Sistema valida datos y crea `User` y `Profile`.
+3. Sistema redirige al dashboard o login.
+Flujos Alternativos:
+- Si correo/usuario ya existe -> mostrar error y pedir corrección.
+- Si datos inválidos -> mostrar validaciones.
+
+
+Nombre: Crear transacción
+Codigo: UC05
+Creado por: Juan Pablo García
+Fecha de Creacion: 01-12-2025
+Actores: Usuario autenticado
+Descripcion: Permite registrar una transacción (ingreso o gasto) ligada a una categoría y fecha.
+Disparador: Usuario completa el formulario de nueva transacción y lo envía.
+Pre-Condiciones: Usuario autenticado; categoría existente para el usuario.
+Post-Condiciones: Nueva `Ingreso` o `Gasto` creada; `Profile.saldo_actual` actualizado; `Presupuesto.gasto_actual` actualizado si aplica; reportes considerarán la transacción.
+Flujo normal:
+1. Usuario selecciona tipo, categoría, monto, fecha y descripción.
+2. Sistema valida datos y crea objeto `Ingreso` o `Gasto`.
+3. Se ejecuta `registrar()` que modifica saldo del `Profile`.
+4. Sistema muestra confirmación y actualiza vistas afectadas.
+Flujos Alternativos:
+- Si la categoría no pertenece al usuario -> error.
+- Si hay validaciones de monto -> error.
+
+
+Nombre: Crear presupuesto
+Codigo: UC09
+Creado por: Juan Pablo García
+Fecha de Creacion: 01-12-2025
+Actores: Usuario autenticado
+Descripcion: Crear un límite de gasto para una categoría en un mes específico.
+Disparador: Usuario crea un presupuesto desde el panel de presupuestos.
+Pre-Condiciones: Usuario autenticado; categoría existente.
+Post-Condiciones: `Presupuesto` creado con `gasto_actual` inicializado en 0.
+Flujo normal:
+1. Usuario elige categoría, mes y monto límite.
+2. Sistema valida y crea `Presupuesto`.
+3. Si se registran transacciones posteriores para la categoría/mes, `gasto_actual` se actualiza.
+Flujos Alternativos:
+- Si ya existe un presupuesto para la misma categoría y mes -> opción para editar o error.
+
+
+**Resúmen de organización del código (para entregables y lectura rápida)**
+
+- Aplicaciones principales: `users/`, `transactions/`, `categories/`, `budgets/`, `goals/`, `reports/`.
+- Lógica de negocio encapsulada en `services/*_manager.py` por cada app: `TransactionManager`, `CategoryManager`, `BudgetManager`, `GoalManager`, `UserManagerService`.
+- Templates centralizados en `templates/` con subcarpetas por módulo.
+- Configuración en `MyFinanceApp/settings.py` (uso de `decouple` para vars sensibles y `DATABASES` para PostgreSQL).
+
+**Instrucciones de despliegue (local)**
+
+1. Crear entorno virtual e instalar dependencias:
 
 ```bash
-python -m venv venv
-source venv/bin/activate
-```
-
-2. Instalar dependencias (si tienes `requirements.txt`):
-
-```bash
+python -m venv ./venv
+source ./venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Migrar y crear superusuario:
+2. Configurar variables de entorno (ejemplo con `.env` usando `python-decouple`):
+
+```
+SECRET_KEY=tu_secret_key
+DEBUG=True
+DB_NAME=tu_db
+DB_USER=tu_usuario
+DB_PASSWORD=tu_password
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+3. Migraciones y creación de superusuario:
 
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
 ```
@@ -72,60 +257,14 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-5. URLs útiles durante desarrollo:
-	- Transacciones: `/transactions/`
-	- Crear transacción: `/transactions/create/`
-	- Presupuestos (CRUD) — ruta depende de la app `budgets` y su URLconf
-	- Metas: `/goals/` (la ruta de recalculado existe pero no se integra automáticamente en flujos)
+5. (Opcional) Configurar compilación de assets Tailwind según su flujo (no incluido explícitamente en `requirements.txt`).
 
-**Estructura de carpetas (resumen)**
-Ejemplo de organización esperada en la raíz del proyecto Django:
+**Notas y recomendaciones**
 
-```
-My-Finance-App-Django/
-├─ manage.py
-├─ requirements.txt
-├─ README.md
-├─ <project_name>/          # settings, urls, wsgi/asgi
-├─ users/
-├─ categories/
-├─ transactions/
-│  ├─ views.py
-│  ├─ forms.py
-│  ├─ services/
-│  │  └─ transaction_manager.py
-│  └─ templates/transactions/
-├─ budgets/
-│  ├─ models.py
-│  ├─ signals.py
-│  └─ templates/budgets/
-├─ goals/
-├─ reports/
-└─ templates/
-```
-
-Nota: acabo de ver que generaste `requirements.txt` — úsalo para instalar dependencias con `pip install -r requirements.txt`.
-
-- **Patrón de diseño y responsabilidades**
-- Se sigue una aproximación en capas con una *service layer* para la lógica de negocio (ej. `TransactionManager`) y vistas/plantillas para la presentación. Ventajas:
-	- Separa responsabilidades: vistas orquestan, servicios ejecutan reglas de negocio y modelos almacenan estado.
-	- Facilita pruebas unitarias de la lógica de negocio (probar servicios aislados).
-	- Señales (`signals`) se usan para mantener invariantes cruzadas (por ejemplo sincronizar `Presupuesto.gasto_actual` cuando cambian transacciones).
-
-- **Buenas prácticas**
-	- Mantener la lógica que modifica varios modelos en servicios o tareas, no directamente en vistas.
-	- Mantener las señales simples y determinísticas; si la actualización es compleja, considerar tareas asíncronas.
-	- Documentar comandos/acciones administrativas (p. ej. convertir `recalculate_progress_from_transactions` en `manage.py recalculate_goals`).
-- Si solo necesitas recalcular progreso desde transacciones de vez en cuando, considera convertir `recalculate_progress_from_transactions` en un comando de management y eliminar la vista pública.
-- Extraer la lógica de evaluación de presupuesto a `budgets/services.py` la hace reutilizable (actualmente está en `transactions/views.py` como helper, se puede mover si prefieres).
-- Añadir tests unitarios para `TransactionManager`, signals de `budgets` y `reports/views.py` ayudará a mantener estabilidad al refactorizar.
-- Si planeas notificaciones persistentes (email/alertas), añade un modelo `Notification` y una tarea asíncrona (Celery / RQ) para manejar envíos.
-
-Si quieres, puedo:
-- Mover el helper de evaluación de presupuesto a `budgets/services.py` para reutilizarlo desde `reports` y `dashboard`.
-- Añadir un ejemplo de flujo práctico en el README y capturas de pantalla/ejemplos de comandos.
-- Generar tests unitarios básicos para el helper y para las señales.
+- Si necesita diagramas UML o imágenes para incluir en la entrega, puedo generar PlantUML y exportar PNG/SVG con las relaciones extraídas.
+- Puedo agregar nombres reales de integrantes del grupo si me los proporciona para la sección `Integrantes`.
+- Si desea, genero un `docs/` con diagramas y plantillas de casos de prueba.
 
 ---
 
-Proyecto mantenido por el autor en el repo `My-Finance-App-Django`.
+Si quiere que inserte este `README.md` en otro formato (PDF, DOCX) o que agregue imágenes (diagramas UML/PlantUML), indíquelo y lo genero.
