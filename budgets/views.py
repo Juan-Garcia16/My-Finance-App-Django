@@ -88,7 +88,7 @@ def edit_budget(request, pk):
 			messages.success(request, 'Presupuesto actualizado.', extra_tags='budgets')
 			return redirect(reverse('budgets:list'))
 		else:
-			#  rendereizar mismo template con modal abierta y errores
+			#  renderizar mismo template con modal abierta y errores
 			budgets = Presupuesto.objects.filter(usuario=profile).select_related('categoria').order_by('-mes', '-pk')
 			for p in budgets:
 				try:

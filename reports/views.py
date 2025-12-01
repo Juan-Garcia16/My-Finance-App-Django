@@ -30,16 +30,18 @@ def reports_index(request):
 		year = now.year
 		month = now.month
 
+    # total de ingresos y gastos por mes
 	ingresos_agg = Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
 	gastos_agg = Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month).aggregate(total=Sum('monto'))
 
+    # valor total
 	ingresos_total = float(ingresos_agg.get('total') or 0)
 	gastos_total = float(gastos_agg.get('total') or 0)
 
-	# net savings for the month
+	# ahorros del mes
 	neto = ingresos_total - gastos_total
 
-	# gastos por categoria for current month
+	# gastos por categoria para cada mes
 	gastos_cat_qs = list(
 		Gasto.objects.filter(usuario=profile, fecha__year=year, fecha__month=month)
 		.values('categoria__nombre')
@@ -48,7 +50,7 @@ def reports_index(request):
 	cat_labels = [c['categoria__nombre'] for c in gastos_cat_qs]
 	cat_values = [float(c['total'] or 0) for c in gastos_cat_qs]
 
-	# ingresos por categoria for current month
+	# ingresos por categoria para cada mes
 	ingresos_cat_qs = list(
 		Ingreso.objects.filter(usuario=profile, fecha__year=year, fecha__month=month)
 		.values('categoria__nombre')
