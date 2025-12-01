@@ -70,7 +70,7 @@
     class="font-display bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark overscroll-none"
   >
     <div class="flex min-h-screen w-full">
-      <!-- SideNavBar -->
+      <!-- Barra lateral de navegacion -->
       <aside
         class="flex sticky top-0 h-screen w-64 flex-col justify-between bg-surface dark:bg-surface-dark p-4 transition-all duration-300"
       >
@@ -179,9 +179,9 @@
           </form>
         </div>
       </aside>
-      <!-- Main Content -->
+      <!-- Contenido Principal -->
       <div class="flex flex-1 flex-col">
-        <!-- TopNavBar -->
+        <!-- Barra Superior -->
         <header
           class="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-surface dark:bg-surface-dark px-6"
         >
@@ -197,7 +197,7 @@
             </a>
           </div>
         </header>
-        <!-- Page Content -->
+        <!-- Contenido de la página -->
         <main class="flex-1 min-w-0 overscroll-none">
           {% block content %}
           {% endblock %}

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="flex-1 p-8 bg-background-light dark:bg-background-dark mb-0 pb-0">
   <div class="max-w-4xl mx-auto px-8 pb-16">
-    <!-- PageHeading -->
+    <!-- Encabezado -->
     <div class="flex flex-wrap justify-between gap-3 pb-8">
       <div class="flex min-w-72 flex-col gap-2">
         <h2 class="text-[#34495e] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
@@ -16,6 +16,7 @@
     </div>
 
     <div class="bg-white dark:bg-[#1C2C21] p-24 py-8 rounded-xl border border-[#dce5df] dark:border-transparent">
+      
       <form method="post" class="space-y-6">
         {% csrf_token %}
         {% if messages %}
@@ -28,6 +29,7 @@
             {% endfor %}
           </div>
         {% endif %}
+        
         <h3 class="text-primary dark:text-white text-[22px] font-bold leading-tight">
           Información Personal
         </h3>
