@@ -14,7 +14,7 @@
 
 # 🎯 1. Contexto del desarrollo
 
-```markdown
+```
 MyFinanceApp es una aplicación web que permite llevar el control de las finanzas personales de cada usuario, ofreciendo manejo de transacciones, categorías de ingresos y gastos, metas de ahorro, presupuestos mensuales y reportes visuales y estadísticos sobre la situación financiera del usuario.
 ```
 
