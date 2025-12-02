@@ -193,8 +193,336 @@ El objetivo de la aplicación es brindar una herramienta centralizada que permit
 ---
 
 # 🧩 9. Casos de uso (detallados)
+---
 
-*(Ya listos y legibles en Markdown — me dices si quieres que te pase cada uno.)*
+## 🟦 **CU-01 — Registro de usuario**
+
+```markdown
+**Nombre:** Registro de cuenta  
+**Código:** CU-01  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario no autenticado  
+**Descripción:**  
+Permite que un nuevo usuario cree una cuenta proporcionando nombre de usuario, correo, contraseña y saldo inicial.
+
+**Disparador:**  
+El usuario selecciona la opción "Registrarse".
+
+**Precondiciones:**  
+- El usuario no debe tener una cuenta registrada previamente.  
+- Todos los campos deben estar completos.
+
+**Postcondiciones:**  
+- Se crea un registro en la base de datos.  
+- Se genera automáticamente un perfil asociado al usuario.
+
+**Flujo normal:**  
+1. El usuario accede al formulario de registro.  
+2. Ingresa nombre de usuario, correo, contraseña y saldo inicial.  
+3. Confirma el registro.  
+4. El sistema crea el usuario y su perfil.  
+5. El usuario es redirigido al login.
+
+**Flujos alternativos:**  
+- **F1:** El usuario ingresa un correo ya registrado → Se muestra mensaje de error.  
+- **F2:** El usuario deja campos vacíos → Se muestran errores de validación.  
+```
+
+---
+
+## 🟦 **CU-02 — Inicio de sesión**
+
+```markdown
+**Nombre:** Inicio de sesión  
+**Código:** CU-02  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+Permite que un usuario autenticado acceda a la plataforma.
+
+**Disparador:**  
+El usuario selecciona “Iniciar sesión”.
+
+**Precondiciones:**  
+- El usuario debe estar registrado.
+
+**Postcondiciones:**  
+- Se crea sesión activa.  
+- El usuario es enviado al Dashboard.
+
+**Flujo normal:**  
+1. El usuario ingresa usuario y contraseña.  
+2. El sistema valida credenciales.  
+3. Accede al Dashboard.
+
+**Flujos alternativos:**  
+- **F1:** Contraseña incorrecta → Mensaje de error.  
+- **F2:** Usuario no registrado → Mensaje de error.  
+```
+
+---
+
+## 🟦 **CU-03 — Ver Dashboard**
+
+```markdown
+**Nombre:** Ver Dashboard  
+**Código:** CU-03  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+El usuario visualiza un resumen financiero del mes actual, incluyendo balance total, ingresos, gastos, gráficas y últimas transacciones.
+
+**Disparador:**  
+El usuario inicia sesión o selecciona “Dashboard”.
+
+**Precondiciones:**  
+- El usuario debe estar autenticado.
+
+**Postcondiciones:**  
+- Se muestran datos actualizados del mes actual.
+
+**Flujo normal:**  
+1. El usuario accede al Dashboard.  
+2. El sistema consulta ingresos y gastos del mes.  
+3. Calcula balance total.  
+4. Muestra gráfica diaria.  
+5. Muestra últimas 5 transacciones.
+
+**Flujos alternativos:**  
+- **F1:** No existen transacciones registradas → Se muestran valores en 0.  
+```
+
+---
+
+## 🟦 **CU-04 — Crear categoría**
+
+```markdown
+**Nombre:** Crear categoría  
+**Código:** CU-04  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+Permite al usuario crear categorías personalizadas para clasificar transacciones.
+
+**Disparador:**  
+El usuario selecciona “Crear categoría”.
+
+**Precondiciones:**  
+- El usuario debe estar autenticado.  
+- El nombre no debe existir ya en sus categorías.
+
+**Postcondiciones:**  
+- La categoría queda registrada y disponible.
+
+**Flujo normal:**  
+1. El usuario accede al módulo de categorías.  
+2. Ingresa nombre, tipo y color.  
+3. Confirma creación.  
+4. El sistema valida duplicados.  
+5. Se guarda la categoría.
+
+**Flujos alternativos:**  
+- **F1:** Nombre repetido → Se muestra error.  
+```
+
+---
+
+## 🟦 **CU-05 — Crear transacción**
+
+```markdown
+**Nombre:** Crear transacción  
+**Código:** CU-05  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+Permite registrar ingresos o gastos que afectan el saldo del usuario y actualizan métricas.
+
+**Disparador:**  
+El usuario selecciona “Nueva transacción”.
+
+**Precondiciones:**  
+- El usuario debe estar autenticado.  
+- Debe existir al menos una categoría creada.
+
+**Postcondiciones:**  
+- Se guarda la transacción.  
+- Se actualiza el saldo.  
+- Se afectan reportes, presupuestos y Dashboard.
+
+**Flujo normal:**  
+1. El usuario abre el formulario.  
+2. Ingresa tipo, categoría, monto, fecha y descripción.  
+3. El sistema guarda la transacción.  
+4. Actualiza el saldo del usuario.  
+5. Actualiza presupuestos asociados.  
+6. Redirige al listado.
+
+**Flujos alternativos:**  
+- **F1:** Datos inválidos → Error de validación.  
+```
+
+---
+
+## 🟦 **CU-06 — Editar o eliminar transacción**
+
+```markdown
+**Nombre:** Editar/Eliminar transacción  
+**Código:** CU-06  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+Permite modificar o borrar transacciones existentes.
+
+**Disparador:**  
+El usuario selecciona la opción editar o eliminar.
+
+**Precondiciones:**  
+- El usuario debe haber registrado transacciones.
+
+**Postcondiciones:**  
+- Los cálculos de saldo y presupuestos se recalculan.
+
+**Flujo normal:**  
+1. El usuario abre una transacción existente.  
+2. Modifica sus campos o selecciona eliminar.  
+3. El sistema guarda cambios.  
+4. Actualiza saldo y presupuestos.
+
+**Flujos alternativos:**  
+- **F1:** Transacción inexistente → Error.  
+```
+
+---
+
+## 🟦 **CU-07 — Crear meta de ahorro**
+
+```markdown
+**Nombre:** Crear meta de ahorro  
+**Código:** CU-07  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+El usuario registra una meta de ahorro con un monto objetivo y fecha límite.
+
+**Disparador:**  
+El usuario selecciona “Nueva meta”.
+
+**Precondiciones:**  
+- Debe estar autenticado.
+
+**Postcondiciones:**  
+- La meta queda disponible con progreso inicial 0%.
+
+**Flujo normal:**  
+1. El usuario abre el formulario.  
+2. Agrega nombre, monto objetivo y fecha límite.  
+3. Confirma creación.  
+4. El sistema registra la meta.
+
+**Flujos alternativos:**  
+- **F1:** Datos vacíos → Error.  
+```
+
+---
+
+## 🟦 **CU-08 — Aportar a meta**
+
+```markdown
+**Nombre:** Aportar a meta  
+**Código:** CU-08  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+Permite sumar aportes a una meta de ahorro, aumentando la barra de progreso.
+
+**Disparador:**  
+Usuario selecciona “Añadir aporte”.
+
+**Precondiciones:**  
+- Debe existir la meta.
+
+**Postcondiciones:**  
+- Se actualiza el progreso de la meta.
+
+**Flujo normal:**  
+1. El usuario ingresa monto del aporte.  
+2. El sistema suma al progreso actual.  
+3. Recalcula el porcentaje.
+
+**Flujos alternativos:**  
+- **F1:** Monto no válido → Error.  
+```
+
+---
+
+## 🟦 **CU-09 — Crear presupuesto**
+
+```markdown
+**Nombre:** Crear presupuesto  
+**Código:** CU-09  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+El usuario define un límite mensual por categoría.
+
+**Disparador:**  
+Selecciona “Nuevo presupuesto”.
+
+**Precondiciones:**  
+- Deben existir categorías.
+
+**Postcondiciones:**  
+- El presupuesto queda registrado.
+
+**Flujo normal:**  
+1. Usuario abre formulario.  
+2. Selecciona categoría, mes y establece límite.  
+3. El sistema guarda el presupuesto.
+
+**Flujos alternativos:**  
+- **F1:** Presupuesto ya existente para mes y categoría → Error.  
+```
+
+---
+
+## 🟦 **CU-10 — Ver reportes mensuales**
+
+```markdown
+**Nombre:** Ver reportes mensuales  
+**Código:** CU-10  
+**Creado por:** Juan Pablo García  
+**Fecha de creación:** 2025  
+**Actores:** Usuario  
+**Descripción:**  
+Muestra totales de ingresos, gastos, ahorro neto y gráficos por categoría para un mes.
+
+**Disparador:**  
+Usuario ingresa al módulo “Reportes”.
+
+**Precondiciones:**  
+- Deben existir transacciones o presupuestos en el mes seleccionado.
+
+**Postcondiciones:**  
+- Se muestran estadísticas correctas.
+
+**Flujo normal:**  
+1. Usuario entra a Reportes.  
+2. Selecciona mes anterior o siguiente.  
+3. El sistema calcula totales y gráficos.  
+4. Muestra estado de presupuestos.
+
+**Flujos alternativos:**  
+- **F1:** No hay datos del mes → Se muestran valores vacíos.  
+```
 
 ---
 
