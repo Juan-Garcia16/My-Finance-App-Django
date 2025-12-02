@@ -197,7 +197,7 @@ El objetivo de la aplicación es brindar una herramienta centralizada que permit
 
 ## 🟦 **CU-01 — Registro de usuario**
 
-```markdown
+
 **Nombre:** Registro de cuenta  
 **Código:** CU-01  
 **Creado por:** Juan Pablo García  
@@ -227,13 +227,13 @@ El usuario selecciona la opción "Registrarse".
 **Flujos alternativos:**  
 - **F1:** El usuario ingresa un correo ya registrado → Se muestra mensaje de error.  
 - **F2:** El usuario deja campos vacíos → Se muestran errores de validación.  
-```
+
 
 ---
 
 ## 🟦 **CU-02 — Inicio de sesión**
 
-```markdown
+
 **Nombre:** Inicio de sesión  
 **Código:** CU-02  
 **Creado por:** Juan Pablo García  
@@ -260,13 +260,13 @@ El usuario selecciona “Iniciar sesión”.
 **Flujos alternativos:**  
 - **F1:** Contraseña incorrecta → Mensaje de error.  
 - **F2:** Usuario no registrado → Mensaje de error.  
-```
+
 
 ---
 
 ## 🟦 **CU-03 — Ver Dashboard**
 
-```markdown
+
 **Nombre:** Ver Dashboard  
 **Código:** CU-03  
 **Creado por:** Juan Pablo García  
@@ -293,13 +293,13 @@ El usuario inicia sesión o selecciona “Dashboard”.
 
 **Flujos alternativos:**  
 - **F1:** No existen transacciones registradas → Se muestran valores en 0.  
-```
+
 
 ---
 
 ## 🟦 **CU-04 — Crear categoría**
 
-```markdown
+
 **Nombre:** Crear categoría  
 **Código:** CU-04  
 **Creado por:** Juan Pablo García  
@@ -327,13 +327,13 @@ El usuario selecciona “Crear categoría”.
 
 **Flujos alternativos:**  
 - **F1:** Nombre repetido → Se muestra error.  
-```
+
 
 ---
 
 ## 🟦 **CU-05 — Crear transacción**
 
-```markdown
+
 **Nombre:** Crear transacción  
 **Código:** CU-05  
 **Creado por:** Juan Pablo García  
@@ -364,13 +364,13 @@ El usuario selecciona “Nueva transacción”.
 
 **Flujos alternativos:**  
 - **F1:** Datos inválidos → Error de validación.  
-```
+
 
 ---
 
 ## 🟦 **CU-06 — Editar o eliminar transacción**
 
-```markdown
+
 **Nombre:** Editar/Eliminar transacción  
 **Código:** CU-06  
 **Creado por:** Juan Pablo García  
@@ -396,13 +396,13 @@ El usuario selecciona la opción editar o eliminar.
 
 **Flujos alternativos:**  
 - **F1:** Transacción inexistente → Error.  
-```
+
 
 ---
 
 ## 🟦 **CU-07 — Crear meta de ahorro**
 
-```markdown
+
 **Nombre:** Crear meta de ahorro  
 **Código:** CU-07  
 **Creado por:** Juan Pablo García  
@@ -428,13 +428,13 @@ El usuario selecciona “Nueva meta”.
 
 **Flujos alternativos:**  
 - **F1:** Datos vacíos → Error.  
-```
+
 
 ---
 
 ## 🟦 **CU-08 — Aportar a meta**
 
-```markdown
+
 **Nombre:** Aportar a meta  
 **Código:** CU-08  
 **Creado por:** Juan Pablo García  
@@ -459,13 +459,13 @@ Usuario selecciona “Añadir aporte”.
 
 **Flujos alternativos:**  
 - **F1:** Monto no válido → Error.  
-```
+
 
 ---
 
 ## 🟦 **CU-09 — Crear presupuesto**
 
-```markdown
+
 **Nombre:** Crear presupuesto  
 **Código:** CU-09  
 **Creado por:** Juan Pablo García  
@@ -490,13 +490,13 @@ Selecciona “Nuevo presupuesto”.
 
 **Flujos alternativos:**  
 - **F1:** Presupuesto ya existente para mes y categoría → Error.  
-```
+
 
 ---
 
 ## 🟦 **CU-10 — Ver reportes mensuales**
 
-```markdown
+
 **Nombre:** Ver reportes mensuales  
 **Código:** CU-10  
 **Creado por:** Juan Pablo García  
@@ -522,7 +522,7 @@ Usuario ingresa al módulo “Reportes”.
 
 **Flujos alternativos:**  
 - **F1:** No hay datos del mes → Se muestran valores vacíos.  
-```
+
 
 ---
 
