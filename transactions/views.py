@@ -100,23 +100,6 @@ def transactions_list(request):
     profile = Profile.objects.get(user=request.user)
     manager = TransactionManager(profile)
 
-    # if request.method == 'POST':
-    #     form = TransactionForm(request.POST, usuario=profile)
-    #     if form.is_valid():
-    #         try:
-    #             manager.registrar_transaccion(
-    #                 form.cleaned_data['tipo'],
-    #                 form.cleaned_data['categoria'].id,
-    #                 form.cleaned_data['monto'],
-    #                 form.cleaned_data['fecha'],
-    #                 form.cleaned_data.get('descripcion', ''),
-    #             )
-    #             messages.success(request, 'Transacción registrada.', extra_tags='transactions')
-    #             return redirect('transactions:list')
-    #         except Exception as e:
-    #             messages.error(request, str(e), extra_tags='transactions')
-    # else:
-    #     # formulario en blanco
     form = TransactionForm(usuario=profile)
 
     transactions = manager.listar_transacciones()
