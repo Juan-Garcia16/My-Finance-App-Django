@@ -1,8 +1,8 @@
----
 
-# 📄 **MyFinanceApp — Documentación del Proyecto**
 
----
+#  **MyFinanceApp — Documentación del Proyecto**
+
+
 
 # 🧑‍💻 Integrantes del equipo
 
@@ -22,15 +22,15 @@ MyFinanceApp es una aplicación web que permite llevar el control de las finanza
 
 # 🎯 2. Objetivo del sistema
 
-```markdown
+
 El objetivo de la aplicación es brindar una herramienta centralizada que permita al usuario registrar sus actividades financieras, analizar sus hábitos y tomar decisiones informadas basadas en reportes visuales mensuales.
-```
+
 
 ---
 
 # 🔧 3. Requerimientos funcionales
 
-```markdown
+
 1. El sistema debe permitir registrar usuarios mediante formulario con: nombre de usuario, correo, contraseña y saldo inicial.
 2. El sistema debe permitir autenticación mediante inicio de sesión.
 3. El sistema debe permitir al usuario ver un Dashboard con:
@@ -51,13 +51,13 @@ El objetivo de la aplicación es brindar una herramienta centralizada que permit
     - Gráficas de torta por categoría
     - Estado de presupuestos
 11. El sistema debe permitir navegar entre meses para revisar reportes pasados.
-```
+
 
 ---
 
 # 🧱 4. Requerimientos no funcionales
 
-```markdown
+
 1. La aplicación debe estar desarrollada en Python utilizando Django.
 2. El sistema debe utilizar PostgreSQL como base de datos.
 3. La interfaz gráfica debe contar con al menos 4 pantallas, usando Tailwind CSS.
@@ -72,11 +72,11 @@ El objetivo de la aplicación es brindar una herramienta centralizada que permit
 6. El sistema debe ser accesible mediante navegador web.
 7. El tiempo de respuesta debe ser menor a 3 segundos por operación.
 8. El sistema debe ser compatible con dispositivos móviles.
-```
+
 
 ---
 
-# 🧩 5. Flujo general de trabajo (explicación por módulos)
+# 🐳 5. Flujo general de trabajo (explicación por módulos)
 
 ### 📌 Módulo Usuarios
 
@@ -123,12 +123,12 @@ El objetivo de la aplicación es brindar una herramienta centralizada que permit
 
 # 🧩 6. Librerías implementadas
 
-```markdown
+
 - Django
 - psycopg2 (PostgreSQL)
 - Tailwind CSS
 - Chart.js
-```
+
 
 ---
 
@@ -202,25 +202,81 @@ El objetivo de la aplicación es brindar una herramienta centralizada que permit
 
 ```mermaid
 classDiagram
-    User --> Profile
-    Profile --> Transaction
-    Profile --> Category
-    Profile --> Goal
-    Profile --> Budget
-    Category --> Transaction
-    Category --> Budget
+
+    %% ======================
+    %%        CLASES
+    %% ======================
+
+    class Profile {
+        +moneda: str
+        +saldo_inicial: Decimal
+        +saldo_actual: Decimal
+        +actualizar_saldo(monto)
+    }
+
+    class Category {
+        +nombre: str
+        +tipo: str  <<ingreso|gasto>>
+        +color: str
+        +__str__()
+    }
+
+    class Transaccion {
+        +monto: Decimal
+        +fecha: date
+        +descripcion: str
+        +registrar()
+    }
+
+    class Ingreso {
+        +registrar()  %% polimórfico: suma saldo
+    }
+
+    class Gasto {
+        +registrar()  %% polimórfico: resta saldo
+    }
+
+    class Presupuesto {
+        +mes: int
+        +limite: Decimal
+        +gasto_actual: Decimal
+        +actualizar_gasto(monto)
+        +verificar_limite()
+    }
+
+    class MetaAhorro {
+        +nombre: str
+        +monto_objetivo: Decimal
+        +fecha_limite: date
+        +progreso: Decimal
+        +actualizar_progreso(monto)
+        +porcentaje_progreso()
+    }
+
+
+    %% ======================
+    %%     HERENCIA
+    %% ======================
+
+    Transaccion <|-- Ingreso
+    Transaccion <|-- Gasto
+
+
+    %% ======================
+    %%     RELACIONES
+    %% ======================
+
+    %% PROFILE ES EL USUARIO FINANCIERO
+    Profile "1" --> "*" Category : crea >
+    Profile "1" --> "*" Transaccion : registra >
+    Profile "1" --> "*" Presupuesto : define >
+    Profile "1" --> "*" MetaAhorro : establece >
+
+    %% TRANSACCIONES Y PRESUPUESTOS DEPENDEN DE CATEGORÍAS
+    Category "1" --> "*" Transaccion : clasifica >
+    Category "1" --> "*" Presupuesto : pertenece a >
+
 ```
 
 ---
 
-# ✅ SIGUIENTE PASO
-
-Ya está completado el **BLOQUE 1–2–3** con toda la parte inicial del documento.
-
-### ❓ ¿Quieres que continúe con:
-
-* **Casos de uso completos en formato extendido?**
-* **Más diagramas (lógica, flujo, navegación)?**
-* **Agregar imágenes tipo ASCII para secciones?**
-
-Dime: **“continúa con los casos de uso”** o **“continúa con todo lo que falta”**.
